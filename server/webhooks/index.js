@@ -2,6 +2,7 @@
 import { DeliveryMethod } from "@shopify/shopify-api";
 import shopify from "../../utils/shopifyConfig.js";
 import appUninstallHandler from "./app_uninstalled.js";
+import orderPaidHandler from "./order_paid.js";
 
 /*
   Template for adding new topics:
@@ -25,6 +26,11 @@ const webhookRegistrar = async () => {
       callbackUrl: "/webhooks/app_uninstalled",
       callback: appUninstallHandler,
     },
+    ORDERS_PAID: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/orders_paid",
+      callback: orderPaidHandler,
+    }
   });
 };
 

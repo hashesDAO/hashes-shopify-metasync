@@ -43,34 +43,6 @@ const DebugIndex = () => {
             </p>
           </LegacyCard>
         </Layout.Section>
-        <Layout.Section oneHalf>
-          <LegacyCard
-            sectioned
-            title="Billing API"
-            primaryFooterAction={{
-              content: "Cha-Ching",
-              onAction: () => {
-                navigate("/debug/billing");
-              },
-            }}
-          >
-            <p>Subscribe merchant to a plan and explore existing plans.</p>
-          </LegacyCard>
-        </Layout.Section>
-        <Layout.Section oneHalf>
-          <LegacyCard
-            sectioned
-            title="Dev Notes"
-            primaryFooterAction={{
-              content: "Let's go",
-              onAction: () => {
-                navigate("/debug/devNotes");
-              },
-            }}
-          >
-            <p>Notes for devs on expectations.</p>
-          </LegacyCard>
-        </Layout.Section>
       </Layout>
     </Page>
   );

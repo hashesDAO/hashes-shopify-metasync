@@ -52,6 +52,12 @@ const authMiddleware = (app) => {
         session,
       }); //Register all webhooks with offline token
       console.log(webhookRegisterResponse); //This is an array that includes all registry responses.
+      // fs.writeFile(`${process.cwd()}/response.txt`, JSON.stringify(webhookRegisterResponse), (err, data)=> {
+      //   if (err){ 
+      //     return console.error("Eh")
+      //   }
+      //   console.log("----> Written to file");
+      // })
 
       return await shopify.auth.begin({
         shop: session.shop,

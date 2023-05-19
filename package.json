@@ -16,11 +16,12 @@
     "update:check": "ncu",
     "update:url": "node devUtils/updateDashboard.js",
     "dev": "concurrently \"npm run dev:*\"",
-    "dev:server": "NODE_ENV=dev nodemon server/index.js --ignore client/ --ignore dist/",
+    "dev:server": "\"NODE_ENV=dev nodemon server/index.js --ignore client/ --ignore dist/\" \"nodemon -x tsoa spec\"",
     "dev:client": "vite --config=./client/vite.config.cjs",
     "preserve": "npm run build",
-    "build": "vite build --config=./client/vite.config.cjs",
-    "start": "NODE_ENV=prod node server/index.js",
+    "build": "vite build --config=./client/vite.config.cjs && npx tsoa spec-and-routes && rimraf ./build && tsc",
+    "start": "NODE_ENV=prod npm run build && node server/index.js",
+
     "pretty": "prettier --write .",
     "ngrok:auth": "ngrok authtoken <your-auth-token>",
     "ngrok": "ngrok http 5173",
@@ -44,7 +45,9 @@
     "raviger": "^4.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "serve-static": "^1.15.0"
+    "serve-static": "^1.15.0",
+    "swagger-ui-express": "^4.6.2",
+    "tsoa": "^5.1.1"
   },
   "devDependencies": {
     "@shopify/app": "^3.45.4",
@@ -56,6 +59,8 @@
     "nodemon": "^2.0.22",
     "npm-check-updates": "^16.10.12",
     "prettier": "^2.8.8",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.0.4",
     "vite": "^4.3.5"
   },
   "overrides": {

@@ -1,0 +1,76 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "shopify-express-boilerplate",
+		"version": "0.0.6",
+		"description": "Shopify Boilerplate Code written in React, Node, Express, MongoDB and GraphQL",
+		"contact": {
+			"name": "Harshdeep Singh Hura",
+			"url": "https://harshdeephura.com"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/traders/early": {
+			"post": {
+				"operationId": "FindEarlyBuyersForCoins",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/traders/whales": {
+			"post": {
+				"operationId": "FindWhaleBuyersDuringTimeFrame",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

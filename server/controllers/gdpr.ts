@@ -4,7 +4,7 @@
  *
  */
 
-const customerDataRequest = async (topic, shop, webhookRequestBody) => {
+const customerDataRequest = async (topic: any, shop: any, webhookRequestBody: any) => {
   // Payload
   // {
   //   "shop_id": 123456,
@@ -39,7 +39,7 @@ const customerDataRequest = async (topic, shop, webhookRequestBody) => {
  *
  */
 
-const customerRedact = async (topic, shop, webhookRequestBody) => {
+const customerRedact = async (topic: string, shop: any, webhookRequestBody: any) => {
   // Payload
   // {
   //   "shop_id": 123456,
@@ -71,7 +71,7 @@ const customerRedact = async (topic, shop, webhookRequestBody) => {
  *
  */
 
-const shopRedact = async (topic, shop, webhookRequestBody) => {
+const shopRedact = async (topic: string, shop: any, webhookRequestBody: any) => {
   // Payload
   // {
   //   "shop_id": 123456,

@@ -1,8 +1,8 @@
 //Combine all your webhooks here
 import { DeliveryMethod } from "@shopify/shopify-api";
-import shopify from "../../utils/shopifyConfig.js";
-import appUninstallHandler from "./app_uninstalled.js";
-import orderPaidHandler from "./order_paid.js";
+import shopify from "../../utils/shopifyConfig";
+import appUninstallHandler from "./app_uninstalled";
+import orderPaidHandler from "./order_paid";
 
 /*
   Template for adding new topics:

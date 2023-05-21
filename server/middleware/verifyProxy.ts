@@ -1,17 +1,18 @@
 import crypto from "crypto";
 
-const verifyProxy = (req, res, next) => {
+const verifyProxy = (req: any, res: any, next: any) => {
   const { signature } = req.query;
 
   const queryURI = req._parsedUrl.query
     .replace("/?", "")
     .replace(/&signature=[^&]*/, "")
     .split("&")
-    .map((x) => decodeURIComponent(x))
+    .map((x: any) => decodeURIComponent(x))
     .sort()
     .join("");
 
   const calculatedSignature = crypto
+    // @ts-ignore
     .createHmac("sha256", process.env.SHOPIFY_API_SECRET)
     .update(queryURI, "utf-8")
     .digest("hex");

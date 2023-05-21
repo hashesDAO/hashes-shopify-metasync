@@ -1,5 +1,5 @@
-import sessionHandler from "../../utils/sessionHandler.js";
-import shopify from "../../utils/shopifyConfig.js";
+import sessionHandler from "../../utils/sessionHandler";
+import shopify from "../../utils/shopifyConfig";
 
 const TEST_QUERY = `
 {
@@ -8,7 +8,7 @@ const TEST_QUERY = `
   }
 }`;
 
-const verifyRequest = async (req, res, next) => {
+const verifyRequest = async (req: any, res: any, next: any) => {
   try {
     let { shop } = req.query;
     const sessionId = await shopify.session.getCurrentId({
@@ -19,12 +19,15 @@ const verifyRequest = async (req, res, next) => {
 
     const session = await sessionHandler.loadSession(sessionId);
 
+    // @ts-ignore
     if (new Date(session?.expires) > new Date()) {
-      // if (session?.isActive()) {
+      // if (session?.isActive())    
+      // @ts-ignore
       const client = new shopify.clients.Graphql({ session });
       await client.query({ data: TEST_QUERY });
       res.setHeader(
         "Content-Security-Policy",
+            // @ts-ignore
         `frame-ancestors https://${session.shop} https://admin.shopify.com;`
       );
       return next();

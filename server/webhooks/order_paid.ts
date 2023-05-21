@@ -1,9 +1,9 @@
 const orderPaidHandler = async (
-  topic,
-  shop,
-  webhookRequestBody,
-  webhookId,
-  apiVersion
+  topic: any,
+  shop: any,
+  webhookRequestBody: any,
+  webhookId: any,
+  apiVersion: any
 ) => {
   console.log(webhookRequestBody)
 };

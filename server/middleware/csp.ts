@@ -1,6 +1,6 @@
-import shopify from "../../utils/shopifyConfig.js";
+import shopify from "../../utils/shopifyConfig"
 
-const csp = (req, res, next) => {
+const csp = (req: any, res: any, next: any) => {
   const shop = req.query.shop || "*.myshopify.com";
   if (shopify.config.isEmbeddedApp && shop) {
     res.setHeader(

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import clientProvider from "../../../utils/clientProvider.js";
+import clientProvider from "../../../utils/clientProvider";
 const proxyRouter = Router();
 
 proxyRouter.get("/json", async (req, res) => {

@@ -1,10 +1,11 @@
 import { Session } from "@shopify/shopify-api";
 import Cryptr from "cryptr";
-import SessionModel from "./models/SessionModel.js";
+import SessionModel from "./models/SessionModel";
 
+// @ts-ignore
 const cryption = new Cryptr(process.env.ENCRYPTION_STRING);
 
-const storeSession = async (session) => {
+const storeSession = async (session: any) => {
   await SessionModel.findOneAndUpdate(
     { id: session.id },
     {
@@ -17,7 +18,7 @@ const storeSession = async (session) => {
   return true;
 };
 
-const loadSession = async (id) => {
+const loadSession = async (id: any) => {
   const sessionResult = await SessionModel.findOne({ id });
   if (sessionResult === null) {
     return undefined;
@@ -30,7 +31,7 @@ const loadSession = async (id) => {
   return undefined;
 };
 
-const deleteSession = async (id) => {
+const deleteSession = async (id: any) => {
   await SessionModel.deleteMany({ id });
   return true;
 };

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import clientProvider from "../../utils/clientProvider.js";
+import clientProvider from "../../utils/clientProvider";
 
 const subscriptionRoute = Router();
 
@@ -20,7 +20,7 @@ subscriptionRoute.get("/api/recurringSubscription", async (req, res) => {
   const planName = "$10.25 plan";
   const planPrice = 10.25; //Always a decimal
 
-  const response = await client.query({
+  const response: any = await client.query({
     data: `mutation CreateSubscription{
     appSubscriptionCreate(
       name: "${planName}"

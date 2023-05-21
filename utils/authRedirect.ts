@@ -1,6 +1,6 @@
-import shopify from "./shopifyConfig.js";
+import shopify from "./shopifyConfig";
 
-const authRedirect = async (req, res) => {
+const authRedirect = async (req: any, res: any) => {
   if (!req.query.shop) {
     res.status(500);
     return res.send("No shop provided");

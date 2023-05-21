@@ -1,27 +1,23 @@
 {
-  "name": "shopify-express-boilerplate",
-  "version": "0.0.6",
-  "description": "Shopify Boilerplate Code written in React, Node, Express, MongoDB and GraphQL",
-  "type": "module",
+  "name": "hashes-shopify-metasync",
+  "version": "0.0.1",
+  "description": "",
   "author": {
-    "name": "Harshdeep Singh Hura",
-    "url": "https://harshdeephura.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kinngh/shopify-node-express-mongodb-app.git"
+    "name": "bgibers"
   },
   "scripts": {
     "update": "ncu -u",
     "update:check": "ncu",
     "update:url": "node devUtils/updateDashboard.js",
     "dev": "concurrently \"npm run dev:*\"",
-    "dev:server": "\"NODE_ENV=dev nodemon server/index.js --ignore client/ --ignore dist/\" \"nodemon -x tsoa spec\"",
+    "dev:server": "NODE_ENV=dev nodemon --ignore client/ --ignore dist/",
     "dev:client": "vite --config=./client/vite.config.cjs",
+    "dev:tsoa": "tsoa spec-and-routes && tsc",
     "preserve": "npm run build",
     "build": "vite build --config=./client/vite.config.cjs && npx tsoa spec-and-routes && rimraf ./build && tsc",
-    "start": "NODE_ENV=prod npm run build && node server/index.js",
-
+    "start": "NODE_ENV=prod npm run build && node build/server/index.js",
+    "predev": "tsoa spec",
+    "prebuild": "tsoa spec",
     "pretty": "prettier --write .",
     "ngrok:auth": "ngrok authtoken <your-auth-token>",
     "ngrok": "ngrok http 5173",
@@ -53,6 +49,8 @@
     "@shopify/app": "^3.45.4",
     "@shopify/cli": "^3.45.4",
     "@shopify/cli-kit": "^3.45.4",
+    "@types/compression": "^1.7.2",
+    "@types/swagger-ui-express": "^4.1.3",
     "@vitejs/plugin-react": "^4.0.0",
     "concurrently": "^8.0.1",
     "ngrok": "^4.3.3",
@@ -61,6 +59,7 @@
     "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4",
+    "ts-node": "^10.9.1",
     "vite": "^4.3.5"
   },
   "overrides": {

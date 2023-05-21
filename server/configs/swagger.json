@@ -9,12 +9,10 @@
 		"securitySchemes": {}
 	},
 	"info": {
-		"title": "shopify-express-boilerplate",
-		"version": "0.0.6",
-		"description": "Shopify Boilerplate Code written in React, Node, Express, MongoDB and GraphQL",
+		"title": "hashes-shopify-metasync",
+		"version": "0.0.1",
 		"contact": {
-			"name": "Harshdeep Singh Hura",
-			"url": "https://harshdeephura.com"
+			"name": "bgibers"
 		}
 	},
 	"openapi": "3.0.0",

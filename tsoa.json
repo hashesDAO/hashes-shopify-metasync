@@ -1,5 +1,5 @@
 {
-    "entryFile": "server/index.js",
+    "entryFile": "server/index.ts",
     "noImplicitAdditionalProperties": "throw-on-extras",
     "controllerPathGlobs": ["server/**/*Controller.ts"],
     "spec": { 

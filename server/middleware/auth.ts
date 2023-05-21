@@ -3,17 +3,17 @@ import {
   InvalidOAuthError,
   InvalidSession,
 } from "@shopify/shopify-api";
-import authRedirect from "../../utils/authRedirect.js";
-import SessionModel from "../../utils/models/SessionModel.js";
-import StoreModel from "../../utils/models/StoreModel.js";
-import sessionHandler from "../../utils/sessionHandler.js";
-import shopify from "../../utils/shopifyConfig.js";
+import authRedirect from "../../utils/authRedirect";
+import SessionModel from "../../utils/models/SessionModel";
+import StoreModel from "../../utils/models/StoreModel";
+import sessionHandler from "../../utils/sessionHandler";
+import shopify from "../../utils/shopifyConfig";
 
-const authMiddleware = (app) => {
+const authMiddleware = (app: { get: (arg0: string, arg1: { (req: any, res: any): Promise<void>; (req: any, res: any): Promise<any>; (req: any, res: any): Promise<void>; }) => void; }) => {
   app.get("/auth", async (req, res) => {
     try {
       await authRedirect(req, res);
-    } catch (e) {
+    } catch (e: any) {
       console.error(`---> Error at /auth`, e);
       const { shop } = req.query;
       switch (true) {
@@ -66,7 +66,7 @@ const authMiddleware = (app) => {
         rawRequest: req,
         rawResponse: res,
       });
-    } catch (e) {
+    } catch (e: any) {
       console.error(`---> Error at /auth/tokens`, e);
       const { shop } = req.query;
       switch (true) {
@@ -111,7 +111,7 @@ const authMiddleware = (app) => {
 
       // Redirect to app with shop parameter upon auth
       res.redirect(`/?shop=${shop}&host=${host}`);
-    } catch (e) {
+    } catch (e: any) {
       console.error(`---> Error at /auth/callback`, e);
       const { shop } = req.query;
       switch (true) {

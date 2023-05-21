@@ -1,29 +1,33 @@
 import "@shopify/shopify-api/adapters/node";
 import "dotenv/config";
+import swaggerUi from "swagger-ui-express";
 import Express from "express";
 import mongoose from "mongoose";
 import { resolve } from "path";
-import shopify from "../utils/shopifyConfig.js";
+import shopify from "../utils/shopifyConfig";
 
-import sessionHandler from "../utils/sessionHandler.js";
-import csp from "./middleware/csp.js";
-import setupCheck from "../utils/setupCheck.js";
+import { RegisterRoutes } from "./configs/routes";
+import * as swaggerJson from "./configs/swagger.json";
+
+import sessionHandler from "../utils/sessionHandler";
+import csp from "./middleware/csp";
+import setupCheck from "../utils/setupCheck";
 import {
   customerDataRequest,
   customerRedact,
   shopRedact,
-} from "./controllers/gdpr.js";
-import applyAuthMiddleware from "./middleware/auth.js";
-import isShopActive from "./middleware/isShopActive.js";
-import verifyHmac from "./middleware/verifyHmac.js";
-import verifyProxy from "./middleware/verifyProxy.js";
-import verifyRequest from "./middleware/verifyRequest.js";
-import proxyRouter from "./routes/app_proxy/index.js";
-import userRoutes from "./routes/index.js";
-import webhookRegistrar from "./webhooks/index.js";
-
+} from "./controllers/gdpr";
+import applyAuthMiddleware from "./middleware/auth";
+import isShopActive from "./middleware/isShopActive";
+import verifyHmac from "./middleware/verifyHmac";
+import verifyProxy from "./middleware/verifyProxy";
+import verifyRequest from "./middleware/verifyRequest";
+import proxyRouter from "./routes/app_proxy/index";
+import userRoutes from "./routes/index";
+import webhookRegistrar from "./webhooks/index"
 setupCheck(); // Run a check to ensure everything is setup properly
 
+// @ts-ignore
 const PORT = parseInt(process.env.PORT, 10) || 8081;
 const isDev = process.env.NODE_ENV === "dev";
 
@@ -57,13 +61,13 @@ const createServer = async (root = process.cwd()) => {
           rawResponse: res,
         });
         console.log(`--> Processed ${topic} webhook for ${shop}`);
-      } catch (e) {
+      } catch (e: any) {
         console.error(
           `---> Error while registering ${topic} webhook for ${shop}`,
           e
         );
         if (!res.headersSent) {
-          res.status(500).send(error.message);
+          res.status(500).send(e.message);
         }
       }
     }
@@ -80,6 +84,7 @@ const createServer = async (root = process.cwd()) => {
       });
       const session = await sessionHandler.loadSession(sessionId);
       const response = await shopify.clients.graphqlProxy({
+        // @ts-ignore
         session,
         rawBody: req.body,
       });
@@ -123,12 +128,17 @@ const createServer = async (root = process.cwd()) => {
         break;
     }
 
+    // @ts-ignore
     if (response.success) {
       res.status(200).send();
     } else {
       res.status(403).send("An error occured");
     }
   });
+
+  RegisterRoutes(app);
+  app.use(["/openapi", "/docs", "/swagger"], swaggerUi.serve, swaggerUi.setup(swaggerJson));
+
 
   if (!isDev) {
     const compression = await import("compression").then(

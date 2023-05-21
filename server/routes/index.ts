@@ -1,6 +1,6 @@
 import { Router } from "express";
-import clientProvider from "../../utils/clientProvider.js";
-import subscriptionRoute from "./recurringSubscriptions.js";
+import clientProvider from "../../utils/clientProvider";
+import subscriptionRoute from "./recurringSubscriptions";
 
 const userRoutes = Router();
 userRoutes.use(subscriptionRoute);

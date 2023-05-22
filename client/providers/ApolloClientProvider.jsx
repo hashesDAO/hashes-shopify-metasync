@@ -3,16 +3,16 @@ import {
   ApolloProvider,
   HttpLink,
   InMemoryCache,
-} from "@apollo/client";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
-import { authenticatedFetch } from "@shopify/app-bridge/utilities";
+} from '@apollo/client';
+import { useAppBridge } from '@shopify/app-bridge-react';
+import { Redirect } from '@shopify/app-bridge/actions';
+import { authenticatedFetch } from '@shopify/app-bridge/utilities';
 
 function ApolloClientProvider({ children }) {
   const client = new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
-      credentials: "include",
+      credentials: 'include',
       fetch: fetchContent(),
     }),
   });
@@ -31,10 +31,10 @@ function fetchContent() {
     const response = await fetchFunction(uri, options);
 
     if (
-      response.headers.get("X-Shopify-API-Request-Failure-Reauthorize") === "1"
+      response.headers.get('X-Shopify-API-Request-Failure-Reauthorize') === '1'
     ) {
       const authUrlHeader = response.headers.get(
-        "X-Shopify-API-Request-Failure-Reauthorize-Url"
+        'X-Shopify-API-Request-Failure-Reauthorize-Url'
       );
 
       const redirect = Redirect.create(app);

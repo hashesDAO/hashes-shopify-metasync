@@ -1,5 +1,5 @@
 // Session store model to preserve sessions across restarts.
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const sessionSchema = new mongoose.Schema({
   id: {
@@ -16,6 +16,6 @@ const sessionSchema = new mongoose.Schema({
   },
 });
 
-const SessionModel = mongoose.model("session", sessionSchema);
+const SessionModel = mongoose.model('session', sessionSchema);
 
 export default SessionModel;

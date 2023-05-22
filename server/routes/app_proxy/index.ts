@@ -1,12 +1,13 @@
-import { Router } from "express";
-import clientProvider from "../../../utils/clientProvider";
+import { Router } from 'express';
+import s3Route from '../s3Operations';
+import metadataRoute from '../metadataHandler';
 const proxyRouter = Router();
 
-proxyRouter.get("/json", async (req, res) => {
-  const { client } = await clientProvider.offline.graphqlClient({
-    shop: res.locals.user_shop,
-  });
-  return res.status(200).send({ content: "Proxy Be Working" });
+proxyRouter.use(s3Route);
+proxyRouter.use(metadataRoute);
+
+proxyRouter.get('/json', async (req, res) => {
+  return res.status(200).send({ content: 'Proxy Be Working' });
 });
 
 export default proxyRouter;

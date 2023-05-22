@@ -1,8 +1,8 @@
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
-import { Layout, LegacyCard, Page } from "@shopify/polaris";
-import { navigate } from "raviger";
-import React from "react";
+import { useAppBridge } from '@shopify/app-bridge-react';
+import { Redirect } from '@shopify/app-bridge/actions';
+import { Layout, LegacyCard, Page } from '@shopify/polaris';
+import { navigate } from 'raviger';
+import React from 'react';
 
 const HomePage = () => {
   const app = useAppBridge();
@@ -16,9 +16,9 @@ const HomePage = () => {
             title="Debug Cards"
             sectioned
             primaryFooterAction={{
-              content: "Debug Cards",
+              content: 'Debug Cards',
               onAction: () => {
-                navigate("/debug");
+                navigate('/debug');
               },
             }}
           >

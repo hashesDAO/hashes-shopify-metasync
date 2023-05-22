@@ -1,14 +1,14 @@
-import shopify from "../../utils/shopifyConfig"
+import shopify from '../../utils/shopifyConfig';
 
 const csp = (req: any, res: any, next: any) => {
-  const shop = req.query.shop || "*.myshopify.com";
+  const shop = req.query.shop || '*.myshopify.com';
   if (shopify.config.isEmbeddedApp && shop) {
     res.setHeader(
-      "Content-Security-Policy",
+      'Content-Security-Policy',
       `frame-ancestors https://${shop} https://admin.shopify.com;`
     );
   } else {
-    res.setHeader("Content-Security-Policy", "frame-ancestors 'none';");
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'none';");
   }
 
   next();

@@ -1,8 +1,8 @@
 //Combine all your webhooks here
-import { DeliveryMethod } from "@shopify/shopify-api";
-import shopify from "../../utils/shopifyConfig";
-import appUninstallHandler from "./app_uninstalled";
-import orderPaidHandler from "./order_paid";
+import { DeliveryMethod } from '@shopify/shopify-api';
+import shopify from '../../utils/shopifyConfig';
+import appUninstallHandler from './app_uninstalled';
+import orderPaidHandler from './order_paid';
 
 /*
   Template for adding new topics:
@@ -23,14 +23,14 @@ const webhookRegistrar = async () => {
   shopify.webhooks.addHandlers({
     APP_UNINSTALLED: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks/app_uninstalled",
+      callbackUrl: '/webhooks/app_uninstalled',
       callback: appUninstallHandler,
     },
     ORDERS_PAID: {
       deliveryMethod: DeliveryMethod.Http,
-      callbackUrl: "/webhooks/orders_paid",
+      callbackUrl: '/webhooks/orders_paid',
       callback: orderPaidHandler,
-    }
+    },
   });
 };
 

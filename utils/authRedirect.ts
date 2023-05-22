@@ -1,12 +1,12 @@
-import shopify from "./shopifyConfig";
+import shopify from './shopifyConfig';
 
 const authRedirect = async (req: any, res: any) => {
   if (!req.query.shop) {
     res.status(500);
-    return res.send("No shop provided");
+    return res.send('No shop provided');
   }
 
-  if (req.query.embedded === "1") {
+  if (req.query.embedded === '1') {
     const shop = shopify.utils.sanitizeShop(req.query.shop);
     const queryParams = new URLSearchParams({
       ...req.query,
@@ -19,7 +19,7 @@ const authRedirect = async (req: any, res: any) => {
 
   return await shopify.auth.begin({
     shop: req.query.shop,
-    callbackPath: "/auth/tokens",
+    callbackPath: '/auth/tokens',
     isOnline: false,
     rawRequest: req,
     rawResponse: res,

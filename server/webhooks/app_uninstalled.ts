@@ -1,5 +1,5 @@
-import SessionModel from "../../utils/models/SessionModel";
-import StoreModel from "../../utils/models/StoreModel";
+import SessionModel from '../../utils/models/SessionModel';
+import StoreModel from '../../utils/models/StoreModel';
 
 const appUninstallHandler = async (
   topic: any,

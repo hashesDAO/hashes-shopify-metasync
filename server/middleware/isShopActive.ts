@@ -1,6 +1,6 @@
-import StoreModel from "../../utils/models/StoreModel";
+import StoreModel from '../../utils/models/StoreModel';
 
-const isShopActive = async  (req: any, res: any, next: any) => {
+const isShopActive = async (req: any, res: any, next: any) => {
   const { shop, host } = req.query;
 
   if (!shop) {

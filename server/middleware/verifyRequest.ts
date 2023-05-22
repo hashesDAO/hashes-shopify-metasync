@@ -1,5 +1,5 @@
-import sessionHandler from "../../utils/sessionHandler";
-import shopify from "../../utils/shopifyConfig";
+import sessionHandler from '../../utils/sessionHandler';
+import shopify from '../../utils/shopifyConfig';
 
 const TEST_QUERY = `
 {
@@ -21,13 +21,13 @@ const verifyRequest = async (req: any, res: any, next: any) => {
 
     // @ts-ignore
     if (new Date(session?.expires) > new Date()) {
-      // if (session?.isActive())    
+      // if (session?.isActive())
       // @ts-ignore
       const client = new shopify.clients.Graphql({ session });
       await client.query({ data: TEST_QUERY });
       res.setHeader(
-        "Content-Security-Policy",
-            // @ts-ignore
+        'Content-Security-Policy',
+        // @ts-ignore
         `frame-ancestors https://${session.shop} https://admin.shopify.com;`
       );
       return next();
@@ -43,14 +43,14 @@ const verifyRequest = async (req: any, res: any, next: any) => {
             const payload = await shopify.session.decodeSessionToken(
               authBearer[1]
             );
-            shop = payload.dest.replace("https://", "");
+            shop = payload.dest.replace('https://', '');
           }
         }
       }
       res.status(403);
-      res.header("X-Shopify-API-Request-Failure-Reauthorize", "1");
+      res.header('X-Shopify-API-Request-Failure-Reauthorize', '1');
       res.header(
-        "X-Shopify-API-Request-Failure-Reauthorize-Url",
+        'X-Shopify-API-Request-Failure-Reauthorize-Url',
         `/auth?shop=${shop}`
       );
       res.end();

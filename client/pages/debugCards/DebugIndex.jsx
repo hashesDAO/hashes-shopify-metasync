@@ -1,7 +1,7 @@
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Layout, LegacyCard, Page } from "@shopify/polaris";
-import { navigate } from "raviger";
-import React from "react";
+import { useAppBridge } from '@shopify/app-bridge-react';
+import { Layout, LegacyCard, Page } from '@shopify/polaris';
+import { navigate } from 'raviger';
+import React from 'react';
 
 const DebugIndex = () => {
   const app = useAppBridge();
@@ -9,7 +9,7 @@ const DebugIndex = () => {
     <Page
       title="Debug Cards"
       subtitle="Interact and explore the current installation"
-      breadcrumbs={[{ content: "Home", onAction: () => navigate("/") }]}
+      breadcrumbs={[{ content: 'Home', onAction: () => navigate('/') }]}
     >
       <Layout>
         <Layout.Section oneHalf>
@@ -17,9 +17,9 @@ const DebugIndex = () => {
             sectioned
             title="Webhooks"
             primaryFooterAction={{
-              content: "Explore",
+              content: 'Explore',
               onAction: () => {
-                navigate("/debug/activeWebhooks");
+                navigate('/debug/activeWebhooks');
               },
             }}
           >
@@ -31,9 +31,9 @@ const DebugIndex = () => {
             sectioned
             title="Data Fetching"
             primaryFooterAction={{
-              content: "Explore",
+              content: 'Explore',
               onAction: () => {
-                navigate("/debug/getData");
+                navigate('/debug/getData');
               },
             }}
           >

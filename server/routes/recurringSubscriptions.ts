@@ -1,5 +1,5 @@
-import { Router } from "express";
-import clientProvider from "../../utils/clientProvider";
+import { Router } from 'express';
+import clientProvider from '../../utils/clientProvider';
 
 const subscriptionRoute = Router();
 
@@ -8,7 +8,7 @@ const subscriptionRoute = Router();
 // I usually convert the processing code into it's own function and pass plan name, price and test via different routes, and test charges strictly available to stores from a database.
 // Create a new MongoDB collection and just store test store names in it.
 
-subscriptionRoute.get("/api/recurringSubscription", async (req, res) => {
+subscriptionRoute.get('/api/recurringSubscription', async (req, res) => {
   //false for offline session, true for online session
   const { client, shop } = await clientProvider.graphqlClient({
     req,
@@ -17,7 +17,7 @@ subscriptionRoute.get("/api/recurringSubscription", async (req, res) => {
   });
   const returnUrl = `${process.env.SHOPIFY_APP_URL}/auth?shop=${shop}`;
 
-  const planName = "$10.25 plan";
+  const planName = '$10.25 plan';
   const planPrice = 10.25; //Always a decimal
 
   const response: any = await client.query({
@@ -55,7 +55,7 @@ subscriptionRoute.get("/api/recurringSubscription", async (req, res) => {
       `--> Error subscribing ${shop} to plan:`,
       response.body.data.appSubscriptionCreate.userErrors
     );
-    res.status(400).send({ error: "An error occured." });
+    res.status(400).send({ error: 'An error occured.' });
     return;
   }
 

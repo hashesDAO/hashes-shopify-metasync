@@ -8,11 +8,11 @@
   - May break with a future update to `@shopify/cli-kit`.
  */
 
-import { partnersRequest } from "@shopify/cli-kit/node/api/partners";
-import { AbortError } from "@shopify/cli-kit/node/error";
-import { ensureAuthenticatedPartners } from "@shopify/cli-kit/node/session";
-import { renderSelectPrompt } from "@shopify/cli-kit/node/ui";
-import "dotenv/config";
+import { partnersRequest } from '@shopify/cli-kit/node/api/partners';
+import { AbortError } from '@shopify/cli-kit/node/error';
+import { ensureAuthenticatedPartners } from '@shopify/cli-kit/node/session';
+import { renderSelectPrompt } from '@shopify/cli-kit/node/ui';
+import 'dotenv/config';
 
 const UpdateAppURLQuery = ` mutation appUpdate($apiKey: String!, $applicationUrl: Url!, $redirectUrlWhitelist: [Url]!) {
     appUpdate(input: {apiKey: $apiKey, applicationUrl: $applicationUrl, redirectUrlWhitelist: $redirectUrlWhitelist}) {
@@ -77,7 +77,7 @@ const selectOrgCLI = async (orgs) => {
   }));
 
   const choice = await renderSelectPrompt({
-    message: "Select a Shopify Partner org for this app",
+    message: 'Select a Shopify Partner org for this app',
     choices: orgList,
   });
 
@@ -93,7 +93,7 @@ const getApp = async (apiKey, accessToken) => {
 const updateDashboardURLs = async (apiKey, appUrl) => {
   const accessToken = await ensureAuthenticatedPartners();
 
-  const redirectURLs = appUrl.endsWith("/")
+  const redirectURLs = appUrl.endsWith('/')
     ? [`${appUrl}auth/tokens`, `${appUrl}auth/callback`]
     : [`${appUrl}/auth/tokens`, `${appUrl}/auth/callback`];
 
@@ -109,20 +109,20 @@ const updateDashboardURLs = async (apiKey, appUrl) => {
   if (result.appUpdate.userErrors.length > 0) {
     const errors = result.appUpdate.userErrors
       .map((error) => error.message)
-      .join(", ");
+      .join(', ');
 
     throw new errors.Abort(errors);
   }
 };
 
-console.warn("--> This is for use in DEV mode only");
-console.log("--> Fetching Access Tokens");
+console.warn('--> This is for use in DEV mode only');
+console.log('--> Fetching Access Tokens');
 const accessToken = await ensureAuthenticatedPartners();
-console.log("--> Fetching Orgs");
+console.log('--> Fetching Orgs');
 await selectOrg(accessToken);
-console.log("--> Fetching App Data");
+console.log('--> Fetching App Data');
 const app = await getApp(process.env.SHOPIFY_API_KEY, accessToken);
-console.log("--> Updating URLs");
+console.log('--> Updating URLs');
 await updateDashboardURLs(app.apiKey, process.env.SHOPIFY_APP_URL);
-console.log("--> URLs updated. Please update GDPR and Proxy routes manually");
-console.log("--> Done");
+console.log('--> URLs updated. Please update GDPR and Proxy routes manually');
+console.log('--> Done');

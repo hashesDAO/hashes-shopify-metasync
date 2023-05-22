@@ -1,39 +1,35 @@
-import "@shopify/shopify-api/adapters/node";
-import "dotenv/config";
-import swaggerUi from "swagger-ui-express";
-import Express from "express";
-import mongoose from "mongoose";
-import { resolve } from "path";
-import shopify from "../utils/shopifyConfig";
+import '@shopify/shopify-api/adapters/node';
+import 'dotenv/config';
+import Express from 'express';
+import mongoose from 'mongoose';
+import { resolve } from 'path';
+import shopify from '../utils/shopifyConfig';
 
-import { RegisterRoutes } from "./configs/routes";
-import * as swaggerJson from "./configs/swagger.json";
-
-import sessionHandler from "../utils/sessionHandler";
-import csp from "./middleware/csp";
-import setupCheck from "../utils/setupCheck";
+import sessionHandler from '../utils/sessionHandler';
+import csp from './middleware/csp';
+import setupCheck from '../utils/setupCheck';
 import {
   customerDataRequest,
   customerRedact,
   shopRedact,
-} from "./controllers/gdpr";
-import applyAuthMiddleware from "./middleware/auth";
-import isShopActive from "./middleware/isShopActive";
-import verifyHmac from "./middleware/verifyHmac";
-import verifyProxy from "./middleware/verifyProxy";
-import verifyRequest from "./middleware/verifyRequest";
-import proxyRouter from "./routes/app_proxy/index";
-import userRoutes from "./routes/index";
-import webhookRegistrar from "./webhooks/index"
+} from './controllers/gdpr';
+import applyAuthMiddleware from './middleware/auth';
+import isShopActive from './middleware/isShopActive';
+import verifyHmac from './middleware/verifyHmac';
+import verifyProxy from './middleware/verifyProxy';
+import verifyRequest from './middleware/verifyRequest';
+import proxyRouter from './routes/app_proxy/index';
+import userRoutes from './routes/index';
+import webhookRegistrar from './webhooks/index';
 setupCheck(); // Run a check to ensure everything is setup properly
 
 // @ts-ignore
 const PORT = parseInt(process.env.PORT, 10) || 8081;
-const isDev = process.env.NODE_ENV === "dev";
+const isDev = process.env.NODE_ENV === 'dev';
 
 // MongoDB Connection
 const mongoUrl =
-  process.env.MONGO_URL || "mongodb://127.0.0.1:27017/shopify-express-app";
+  process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/shopify-express-app';
 
 mongoose.connect(mongoUrl);
 
@@ -42,17 +38,17 @@ webhookRegistrar();
 
 const createServer = async (root = process.cwd()) => {
   const app = Express();
-  app.disable("x-powered-by");
+  app.disable('x-powered-by');
 
   applyAuthMiddleware(app);
 
   // Incoming webhook requests
   app.post(
-    "/webhooks/:topic",
-    Express.text({ type: "*/*" }),
+    '/webhooks/:topic',
+    Express.text({ type: '*/*' }),
     async (req, res) => {
-      const { topic } = req.params || "";
-      const shop = req.headers["x-shopify-shop-domain"] || "";
+      const { topic } = req.params || '';
+      const shop = req.headers['x-shopify-shop-domain'] || '';
 
       try {
         await shopify.webhooks.process({
@@ -75,7 +71,7 @@ const createServer = async (root = process.cwd()) => {
 
   app.use(Express.json());
 
-  app.post("/graphql", verifyRequest, async (req, res) => {
+  app.post('/graphql', verifyRequest, async (req, res) => {
     try {
       const sessionId = await shopify.session.getCurrentId({
         isOnline: true,
@@ -98,10 +94,10 @@ const createServer = async (root = process.cwd()) => {
   app.use(csp);
   app.use(isShopActive);
   // If you're making changes to any of the routes, please make sure to add them in `./client/vite.config.cjs` or it'll not work.
-  app.use("/apps", verifyRequest, userRoutes); //Verify user route requests
-  app.use("/proxy_route", verifyProxy, proxyRouter); //MARK:- App Proxy routes
+  app.use('/apps', verifyRequest, userRoutes); //Verify user route requests
+  app.use('/proxy', proxyRouter); //MARK:- App Proxy routes
 
-  app.post("/gdpr/:topic", verifyHmac, async (req, res) => {
+  app.post('/gdpr/:topic', verifyHmac, async (req, res) => {
     const { body } = req;
     const { topic } = req.params;
     const shop = req.body.shop_domain;
@@ -110,13 +106,13 @@ const createServer = async (root = process.cwd()) => {
 
     let response;
     switch (topic) {
-      case "customers_data_request":
+      case 'customers_data_request':
         response = await customerDataRequest(topic, shop, body);
         break;
-      case "customers_redact":
+      case 'customers_redact':
         response = await customerRedact(topic, shop, body);
         break;
-      case "shop_redact":
+      case 'shop_redact':
         response = await shopRedact(topic, shop, body);
         break;
       default:
@@ -124,7 +120,7 @@ const createServer = async (root = process.cwd()) => {
           "--> Congratulations on breaking the GDPR route! Here's the topic that broke it: ",
           topic
         );
-        response = "broken";
+        response = 'broken';
         break;
     }
 
@@ -132,29 +128,25 @@ const createServer = async (root = process.cwd()) => {
     if (response.success) {
       res.status(200).send();
     } else {
-      res.status(403).send("An error occured");
+      res.status(403).send('An error occured');
     }
   });
 
-  RegisterRoutes(app);
-  app.use(["/openapi", "/docs", "/swagger"], swaggerUi.serve, swaggerUi.setup(swaggerJson));
-
-
   if (!isDev) {
-    const compression = await import("compression").then(
+    const compression = await import('compression').then(
       ({ default: fn }) => fn
     );
-    const serveStatic = await import("serve-static").then(
+    const serveStatic = await import('serve-static').then(
       ({ default: fn }) => fn
     );
-    const fs = await import("fs");
+    const fs = await import('fs');
 
     app.use(compression());
-    app.use(serveStatic(resolve("dist/client")));
-    app.use("/*", (req, res, next) => {
+    app.use(serveStatic(resolve('dist/client')));
+    app.use('/*', (req, res, next) => {
       res
         .status(200)
-        .set("Content-Type", "text/html")
+        .set('Content-Type', 'text/html')
         .send(fs.readFileSync(`${root}/dist/client/index.html`));
     });
   }

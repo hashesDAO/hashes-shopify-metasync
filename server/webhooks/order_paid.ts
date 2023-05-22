@@ -5,7 +5,7 @@ const orderPaidHandler = async (
   webhookId: any,
   apiVersion: any
 ) => {
-  console.log(webhookRequestBody)
+  console.log(webhookRequestBody);
 };
 
 export default orderPaidHandler;

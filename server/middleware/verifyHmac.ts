@@ -1,14 +1,14 @@
-import crypto from "crypto";
-import shopify from "../../utils/shopifyConfig";
+import crypto from 'crypto';
+import shopify from '../../utils/shopifyConfig';
 
-const verifyHmac =  (req: any, res: any, next: any) => {
+const verifyHmac = (req: any, res: any, next: any) => {
   try {
     const generateHash = crypto
-        // @ts-ignore
-      .createHmac("SHA256", process.env.SHOPIFY_API_SECRET)
-      .update(JSON.stringify(req.body), "utf8")
-      .digest("base64");
-    const hmac = req.headers["x-shopify-hmac-sha256"];
+      // @ts-ignore
+      .createHmac('SHA256', process.env.SHOPIFY_API_SECRET)
+      .update(JSON.stringify(req.body), 'utf8')
+      .digest('base64');
+    const hmac = req.headers['x-shopify-hmac-sha256'];
 
     if (shopify.auth.safeCompare(generateHash, hmac)) {
       next();

@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { ApiVersion } from "@shopify/shopify-api";
-import sessionHandler from "./sessionHandler";
-import shopify from "./shopifyConfig";
+import { ApiVersion } from '@shopify/shopify-api';
+import sessionHandler from './sessionHandler';
+import shopify from './shopifyConfig';
 
 const currentApiVersion = ApiVersion.January23;
 

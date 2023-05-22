@@ -1,7 +1,7 @@
-import { Provider } from "@shopify/app-bridge-react";
-import { Layout, Page, Spinner } from "@shopify/polaris";
-import { useNavigate, usePath, useQueryParams } from "raviger";
-import { useEffect, useMemo, useState } from "react";
+import { Provider } from '@shopify/app-bridge-react';
+import { Layout, Page, Spinner } from '@shopify/polaris';
+import { useNavigate, usePath, useQueryParams } from 'raviger';
+import { useEffect, useMemo, useState } from 'react';
 
 function AppBridgeProvider({ children }) {
   const navigate = useNavigate();

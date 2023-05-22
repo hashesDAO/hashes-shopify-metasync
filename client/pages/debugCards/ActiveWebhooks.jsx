@@ -1,9 +1,9 @@
-import { gql, useQuery } from "@apollo/client";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { Redirect } from "@shopify/app-bridge/actions";
-import { DataTable, Frame, LegacyCard, Loading, Page } from "@shopify/polaris";
-import { navigate } from "raviger";
-import React from "react";
+import { gql, useQuery } from '@apollo/client';
+import { useAppBridge } from '@shopify/app-bridge-react';
+import { Redirect } from '@shopify/app-bridge/actions';
+import { DataTable, Frame, LegacyCard, Loading, Page } from '@shopify/polaris';
+import { navigate } from 'raviger';
+import React from 'react';
 
 const ActiveWebhooks = () => {
   const app = useAppBridge();
@@ -31,10 +31,10 @@ const ActiveWebhooks = () => {
   let rows = [];
 
   if (loading) {
-    console.log("loading", loading);
+    console.log('loading', loading);
   }
   if (data) {
-    console.log("Rendering Data");
+    console.log('Rendering Data');
     Object.entries(data.webhookSubscriptions.edges).map(([key, value]) => {
       const topic = value.node.topic;
       const callbackUrl = value.node.endpoint.callbackUrl;
@@ -43,8 +43,8 @@ const ActiveWebhooks = () => {
   }
 
   if (error) {
-    rows.push(["Error", "Check console for more info"]);
-    console.log("error", error.message);
+    rows.push(['Error', 'Check console for more info']);
+    console.log('error', error.message);
   }
 
   const { data: myShopifyDomain } = useQuery(
@@ -60,7 +60,7 @@ const ActiveWebhooks = () => {
   return (
     <Page
       title="Webhooks"
-      breadcrumbs={[{ content: "Home", onAction: () => navigate("/debug") }]}
+      breadcrumbs={[{ content: 'Home', onAction: () => navigate('/debug') }]}
     >
       {loading && (
         <Frame>
@@ -69,8 +69,8 @@ const ActiveWebhooks = () => {
       )}
       <LegacyCard>
         <DataTable
-          columnContentTypes={["text", "text"]}
-          headings={["Topic", "Callback Url"]}
+          columnContentTypes={['text', 'text']}
+          headings={['Topic', 'Callback Url']}
           rows={rows}
         />
       </LegacyCard>
@@ -80,7 +80,7 @@ const ActiveWebhooks = () => {
         primaryFooterAction={
           myShopifyDomain
             ? {
-                content: "Reauth",
+                content: 'Reauth',
                 onAction: () => {
                   redirect.dispatch(
                     Redirect.Action.REMOTE,
@@ -88,7 +88,7 @@ const ActiveWebhooks = () => {
                   );
                 },
               }
-            : { content: "Fetching data", disabled: true }
+            : { content: 'Fetching data', disabled: true }
         }
       >
         <p>

@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import clientProvider from '../../utils/clientProvider';
-import subscriptionRoute from './recurringSubscriptions';
-import s3Route from './s3Operations';
 import metadataRoute from './metadataHandler';
 
 const userRoutes = Router();

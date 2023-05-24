@@ -1,7 +1,7 @@
 import s3 from '../../utils/awsConfig';
 import 'dotenv/config';
 import { GetObjectRequest, PutObjectRequest } from 'aws-sdk/clients/s3';
-import { resolveObjMapThunk } from 'graphql';
+import TokenGateModel from '../../utils/models/TokenGateModel';
 
 export async function createMetadataForCollection(
   address: string,
@@ -14,10 +14,40 @@ export async function createMetadataForCollection(
     const bucketName = process.env.AWS_BUCKET!;
     const key = `${address}/` + i;
 
+    const parsedJson: any = JSON.parse(jsonData);
+
+    await TokenGateModel.updateOne(
+      { contractAddresss: address }, // Filter criteria
+      {
+        $set: {
+          productName: parsedJson.name,
+          numTokens: tokenAmt,
+        },
+      }, // Update values
+      { upsert: true }
+    )
+      .then((result) => {
+        console.log('Upsert result:', result);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+    if (
+      !parsedJson.attributes.find(
+        (attribute: any) => attribute.trait_type === 'Claimed'
+      )
+    ) {
+      parsedJson.attributes.push({
+        trait_type: 'Claimed',
+        value: 'False',
+      });
+    }
+
     const params: PutObjectRequest = {
       Bucket: bucketName,
       Key: key,
-      Body: jsonData,
+      Body: JSON.stringify(parsedJson),
     };
 
     promises.push(await uploadToS3(params));

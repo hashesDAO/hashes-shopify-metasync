@@ -21,6 +21,9 @@ import verifyRequest from './middleware/verifyRequest';
 import proxyRouter from './routes/app_proxy/index';
 import userRoutes from './routes/index';
 import webhookRegistrar from './webhooks/index';
+
+const morgan = require('morgan');
+
 setupCheck(); // Run a check to ensure everything is setup properly
 
 // @ts-ignore
@@ -39,6 +42,8 @@ webhookRegistrar();
 const createServer = async (root = process.cwd()) => {
   const app = Express();
   app.disable('x-powered-by');
+
+  app.use(morgan('tiny'));
 
   applyAuthMiddleware(app);
 

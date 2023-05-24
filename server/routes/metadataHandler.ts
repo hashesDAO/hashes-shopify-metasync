@@ -41,11 +41,9 @@ metadataRoute.put('/metadata/:contractAddress/:tokenId', async (req, res) => {
       });
     })
     .catch((error) => {
-      res
-        .status(500)
-        .json({
-          error: `JSON data FAILED to update for ${contractAddress}-${tokenId} ERROR: ${error}`,
-        });
+      res.status(500).json({
+        error: `JSON data FAILED to update for ${contractAddress}-${tokenId} ERROR: ${error}`,
+      });
     });
 });
 
@@ -60,4 +58,5 @@ metadataRoute.get('/metadata/:contractAddress/:tokenId', async (req, res) => {
       res.status(500).json({ error: error });
     });
 });
+
 export default metadataRoute;

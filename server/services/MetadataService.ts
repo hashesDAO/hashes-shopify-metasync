@@ -15,12 +15,13 @@ export async function createMetadataForCollection(
     const key = `${address}/` + i;
 
     const parsedJson: any = JSON.parse(jsonData);
+    const name = parsedJson.name.toLowerCase().trim();
 
     await TokenGateModel.updateOne(
-      { contractAddresss: address }, // Filter criteria
+      { contractAddress: address }, // Filter criteria
       {
         $set: {
-          productName: parsedJson.name,
+          productName: name,
           numTokens: tokenAmt,
         },
       }, // Update values

@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import TokenGateModel from '../../utils/models/TokenGateModel';
 
@@ -26,20 +28,20 @@ const orderPaidHandler = async (
   const id = jsonReponse.id;
   const orderNumber = jsonReponse.order_number;
 
-  jsonReponse.line_items.forEach(async (item: any) => {
+  jsonReponse?.line_items.forEach(async (item: any) => {
     const walletUsed = item.properties.find(
-      (name: any) => name === '_wallet'
+      (prop: any) => prop.name === '_wallet'
     )?.value;
 
     const tokenId = item.properties.find(
-      (name: any) => name === 'Token ID'
+      (prop: any) => prop.name === 'Token ID'
     )?.value;
 
     const tokenGateId = item.properties.find(
-      (name: any) => name === '_token_gate_id'
+      (prop: any) => prop.name === '_token_gate_id'
     )?.value;
 
-    const productName = item.name;
+    const productName = item.name.toLowerCase().trim();
 
     const tknGate = await TokenGateModel.findOne({
       productName: productName,
@@ -91,9 +93,16 @@ const orderPaidHandler = async (
             });
         }
       );
-      // update metadata on OS https://api.opensea.io/api/v1/asset/<your_contract_address>/<token_id>/?force_update=true
+      await updateOSMetadata(contractAddress, tokenId);
     }
   });
 };
+
+async function updateOSMetadata(contractAddress: string, tokenId: Number) {
+  const res = await fetch(
+    `https://api.opensea.io/api/v1/asset/${contractAddress}/${tokenId}/?force_update=true`
+  );
+  await res.status;
+}
 
 export default orderPaidHandler;

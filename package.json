@@ -29,6 +29,7 @@
     "@shopify/app-bridge": "^3.7.7",
     "@shopify/app-bridge-react": "^3.7.7",
     "@shopify/polaris": "^10.49.1",
+    "@shopify/post-purchase-ui-extensions-react": "^0.13.4",
     "@shopify/shopify-api": "^7.0.0",
     "aws-sdk": "^2.1381.0",
     "compression": "^1.7.4",
@@ -72,6 +73,12 @@
       "react": "18.2.0"
     },
     "@shopify/app": {
+      "react": "18.2.0"
+    },
+    "@shopify/post-purchase-ui-extensions": {
+      "react": "18.2.0"
+    },
+    "@shopify/post-purchase-ui-extensions-react": {
       "react": "18.2.0"
     }
   }

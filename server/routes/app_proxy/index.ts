@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import metadataRoute from '../metadataHandler';
+import adminRoute from '../adminHandler';
+import nftRoute from '../nftHandler';
+
 const proxyRouter = Router();
 
-proxyRouter.use(metadataRoute);
+proxyRouter.use(adminRoute);
+proxyRouter.use(nftRoute);
 
 proxyRouter.get('/json', async (req, res) => {
   return res.status(200).send({ content: 'Proxy Be Working' });

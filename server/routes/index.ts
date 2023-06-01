@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import clientProvider from '../../utils/clientProvider';
-import metadataRoute from './metadataHandler';
+import nftRoute from './nftHandler';
 
 const userRoutes = Router();
-userRoutes.use(metadataRoute);
+userRoutes.use(nftRoute);
 
 // TODO: create routes for getting burned tokens and fufilling their orders
 

@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import TokenGateModel from '../../utils/models/TokenGateModel';
 
@@ -7,16 +5,15 @@ import {
   createMetadataForCollection,
   getMetadataByTokenId,
   updateMetadataForToken,
-} from '../services/MetadataService';
+} from '../services/NftService';
 
 /* 
   UPON CHECKOUT AND PAYMENT
     - Parse order details we need
-    - Get contract address saved 
-    - Add store of checkout/tokengate
-    - Call metadata service to get current metadata
-    - Update claimed status to true
-    - Call OS API to force update metadata
+    - Get metadata from samples/contractAddress folder
+    - Update/add metadata we want
+    - Push metadata to drops/burnRedeemAddress
+    - Save orderId,contractAddress etc to database
   */
 const orderPaidHandler = async (
   topic: string,
@@ -58,23 +55,30 @@ const orderPaidHandler = async (
         walletUsed,
         tokenId,
         tokenGateId,
-        contractAddress,
+        burnContractAddress: contractAddress,
       });
 
       await getMetadataByTokenId(contractAddress, tokenId).then(
         async (json: any) => {
-          const existingAttribute = json.attributes.find(
-            (attribute: any) => attribute.trait_type === 'Claimed'
-          );
+          json.attributes.push({
+            trait_type: 'Order Number',
+            value: orderNumber,
+          });
 
-          if (existingAttribute) {
-            existingAttribute.value = 'True';
-          } else {
-            json.attributes.push({
-              trait_type: 'Claimed',
-              value: 'True',
-            });
-          }
+          json.attributes.push({
+            trait_type: 'Claimee',
+            value: walletUsed,
+          });
+
+          json.attributes.push({
+            trait_type: 'Claim Token Address',
+            value: contractAddress,
+          });
+
+          json.attributes.push({
+            trait_type: 'Claim Token ID',
+            value: tokenId,
+          });
 
           await updateMetadataForToken(
             contractAddress,
@@ -93,16 +97,8 @@ const orderPaidHandler = async (
             });
         }
       );
-      await updateOSMetadata(contractAddress, tokenId);
     }
   });
 };
-
-async function updateOSMetadata(contractAddress: string, tokenId: Number) {
-  const res = await fetch(
-    `https://api.opensea.io/api/v1/asset/${contractAddress}/${tokenId}/?force_update=true`
-  );
-  await res.status;
-}
 
 export default orderPaidHandler;

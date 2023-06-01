@@ -1,9 +1,17 @@
 import { useAppBridge } from '@shopify/app-bridge-react';
 import { Redirect } from '@shopify/app-bridge/actions';
-import { Layout, LegacyCard, Link, Page } from '@shopify/polaris';
+import { Layout, LegacyCard, Link, Page, TextField } from '@shopify/polaris';
 import { navigate } from 'raviger';
 import React, { useEffect, useState } from 'react';
 import useFetch from '../../hooks/useFetch';
+
+const defaultPostBody = JSON.stringify(
+  {
+    content: 'Body of POST request',
+  },
+  null,
+  2
+);
 
 const GetData = () => {
   const app = useAppBridge();
@@ -11,33 +19,42 @@ const GetData = () => {
   const [responseData, setResponseData] = useState('');
   const [responseDataPost, setResponseDataPost] = useState('');
   const [responseDataGQL, setResponseDataGQL] = useState('');
+  const [postBody, setPostBody] = useState(defaultPostBody);
+  const [isPostBodyValid, setIsPostBodyValid] = useState(true);
   const fetch = useFetch();
 
   async function fetchContent() {
     setResponseData('loading...');
-    const res = await fetch('/api'); //fetch instance of useFetch()
+    const res = await fetch('/api');
     const { text } = await res.json();
     setResponseData(text);
   }
+
   async function fetchContentPost() {
     setResponseDataPost('loading...');
-    const postBody = JSON.stringify({ content: 'Body of POST request' });
-    const res = await fetch('/api', {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: postBody,
-    }); //fetch instance of useFetch()
+    try {
+      const parsedPostBody = JSON.parse(postBody);
+      setIsPostBodyValid(true);
+      const res = await fetch('/api', {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(parsedPostBody),
+      });
 
-    const { content } = await res.json();
-    setResponseDataPost(content);
+      const { content } = await res.json();
+      setResponseDataPost(content);
+    } catch (error) {
+      setIsPostBodyValid(false);
+      console.error(error);
+    }
   }
 
   async function fetchContentGQL() {
     setResponseDataGQL('loading...');
-    const res = await fetch('/api/gql'); //fetch instance of useFetch()
+    const res = await fetch('/api/gql');
     const response = await res.json();
     setResponseDataGQL(response.body.data.shop.name);
   }
@@ -73,15 +90,28 @@ const GetData = () => {
           <LegacyCard
             sectioned
             primaryFooterAction={{
-              content: 'Refetch',
+              content: 'Submit',
               onAction: () => {
                 fetchContentPost();
               },
             }}
           >
             <p>
-              POST <code>"/apps/api" </code>: {responseDataPost}
+              POST <code>"/apps/api" </code>
             </p>
+            <TextField
+              label="POST Response"
+              value={responseDataPost}
+              readOnly={true}
+            />
+            <TextField
+              label="Post Body"
+              value={postBody}
+              onChange={(newValue) => setPostBody(newValue)}
+              multiline={5} // Set the number of visible rows in the text box
+              error={!isPostBodyValid}
+              helpText={!isPostBodyValid && 'Invalid JSON format'}
+            />
           </LegacyCard>
         </Layout.Section>
         <Layout.Section>
@@ -132,7 +162,7 @@ const GetData = () => {
                 >
                   <code>swr</code>
                 </Link>{' '}
-                for client side data fetching state management.
+                for client-side data fetching state management.
               </li>
             </LegacyCard.Section>
           </LegacyCard>

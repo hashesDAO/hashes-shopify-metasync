@@ -10,10 +10,6 @@ const tokenGateSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  numTokens: {
-    type: Number,
-    required: true,
-  },
 });
 
 const TokenGateModel = mongoose.model('token_gate', tokenGateSchema);

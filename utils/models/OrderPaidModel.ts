@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  contractAddress: {
+  burnContractAddress: {
     type: String,
     required: true,
   },

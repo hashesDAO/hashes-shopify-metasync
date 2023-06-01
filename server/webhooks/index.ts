@@ -26,11 +26,11 @@ const webhookRegistrar = async () => {
       callbackUrl: '/webhooks/app_uninstalled',
       callback: appUninstallHandler,
     },
-    // ORDERS_PAID: {
-    //   deliveryMethod: DeliveryMethod.Http,
-    //   callbackUrl: '/webhooks/orders_paid',
-    //   callback: orderPaidHandler,
-    // },
+    ORDERS_PAID: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: '/webhooks/orders_paid',
+      callback: orderPaidHandler,
+    },
   });
 };
 

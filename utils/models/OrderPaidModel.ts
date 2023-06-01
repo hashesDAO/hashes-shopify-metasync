@@ -1,11 +1,7 @@
 import mongoose from 'mongoose';
 
-/*
-    Used for debugging and error handeling, to ensure all customers orders
-    go smooth
-*/
 const orderSchema = new mongoose.Schema({
-  id: {
+  globalId: {
     type: String,
     required: true,
   },
@@ -13,10 +9,15 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  productId: {
+    type: Number,
+    required: true,
+  },
   walletUsed: {
     type: String,
     required: true,
   },
+  // Token id used for tokengate ie: the burnToken
   tokenId: {
     type: Number,
     required: true,
@@ -25,8 +26,12 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  burnContractAddress: {
-    type: String,
+  fufilled: {
+    type: Boolean,
+    required: true,
+  },
+  burned: {
+    type: Boolean,
     required: true,
   },
 });

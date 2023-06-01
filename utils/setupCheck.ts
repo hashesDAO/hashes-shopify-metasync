@@ -16,18 +16,6 @@ const setupCheck = () => {
 
   let errorCount = 0;
 
-  if (typeof awsKey === 'undefined') {
-    console.error('---> AWS Key is undefined.');
-    errorCount++;
-  }
-  if (typeof awsSecret === 'undefined') {
-    console.error('---> AWS Secret is undefined.');
-    errorCount++;
-  }
-  if (typeof awsBucket === 'undefined') {
-    console.error('---> AWS Bucket is undefined.');
-    errorCount++;
-  }
   if (typeof apiKey === 'undefined') {
     console.error('---> API Key is undefined.');
     errorCount++;

@@ -2,6 +2,12 @@ import 'dotenv/config';
 import fetch from 'node-fetch';
 
 import ProductContractModel from '../../utils/models/ProductContractModel';
+import OrderPaidModel from '../../utils/models/OrderPaidModel';
+import BurnToRedeemModel from '../../utils/models/BurnToRedeemModel';
+import {
+  getBurnedErc1155ForTx,
+  getTransactionHashesForMint,
+} from './NftService';
 
 export async function configureProductsForBurnRedeem(
   responseRequestBody: string
@@ -43,7 +49,72 @@ export async function configureProductsForBurnRedeem(
   return promises;
 }
 
-// TODO: function that loops through logs, and saves what token was burned along with what token was claimed etc
+// make a checkForNewBurns endpoint and save all burns to database
+// get metadata for orderNumber debug endpoint
+
+export async function storeBurnEvents() {
+  const orders = await OrderPaidModel.find({ fufilled: false });
+
+  const productContracts = await ProductContractModel.find();
+  const promises: Promise<any>[] = [];
+
+  for (const element of productContracts) {
+    // Get transactions for all ERC721 claims
+    const claimToBurnTxs: any = await getTransactionHashesForMint(
+      element.redeemContractAddress
+    );
+
+    const burnContractAddress = element.burnContractAddress;
+    const redeemContractAddress = element.redeemContractAddress;
+
+    for (const tx of claimToBurnTxs) {
+      const redeemToken = tx.token_id;
+      const redeemTx = tx.transaction;
+
+      const order = orders.find(
+        (order: any) =>
+          order.productId === element.productId &&
+          order.walletUsed === tx.mintee
+      );
+
+      if (order) {
+        promises.push(
+          new Promise(async (resolve, reject) => {
+            await BurnToRedeemModel.updateOne(
+              { orderNumber: order.orderNumber },
+              {
+                $set: {
+                  orderPaidModel: order._id,
+                  burnContractAddress: burnContractAddress,
+                  redeemContractAddress: redeemContractAddress,
+                  burnedTokenId: order.tokenId,
+                  redeemedTokenId: redeemToken,
+                  claimTx: redeemTx,
+                },
+              },
+              { upsert: true }
+            )
+              .then(async (result) => {
+                await OrderPaidModel.updateOne(
+                  {
+                    orderNumber: order.orderNumber,
+                    productId: order.productId,
+                  },
+                  { $set: { burned: true } }
+                );
+                resolve(true);
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          })
+        );
+      }
+    }
+  }
+
+  return promises;
+}
 
 // TODO: getMetadata thats stored in DB, loop through all orders, grab burned data, and update metadata/push to ipfs
 export async function updateOSMetadataForToken(

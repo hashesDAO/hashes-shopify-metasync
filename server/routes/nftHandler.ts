@@ -8,10 +8,10 @@ import {
 const nftRoute = Router();
 
 // Gets metadata from IPFS for a given contract addr
-nftRoute.get('/metadata/:contractAddress/', async (req, res) => {
-  const { contractAddress } = req.params;
+nftRoute.get('/metadata/:contractAddress/:tokenId', async (req, res) => {
+  const { contractAddress, tokenId } = req.params;
 
-  await getNFTMetadata(contractAddress)
+  await getNFTMetadata(contractAddress, tokenId)
     .then((result) => {
       res.json({ result });
     })

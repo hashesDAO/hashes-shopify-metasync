@@ -1,20 +1,5 @@
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
-import TokenGateModel from '../../utils/models/TokenGateModel';
 
-import {
-  createMetadataForCollection,
-  getMetadataByTokenId,
-  updateMetadataForToken,
-} from '../services/NftService';
-
-/* 
-  UPON CHECKOUT AND PAYMENT
-    - Parse order details we need
-    - Get metadata from samples/contractAddress folder
-    - Update/add metadata we want
-    - Push metadata to drops/burnRedeemAddress
-    - Save orderId,contractAddress etc to database
-  */
 const orderPaidHandler = async (
   topic: string,
   shop: string,
@@ -25,6 +10,7 @@ const orderPaidHandler = async (
   const id = jsonReponse.id;
   const orderNumber = jsonReponse.order_number;
 
+  console.log(jsonReponse);
   jsonReponse?.line_items.forEach(async (item: any) => {
     const walletUsed = item.properties.find(
       (prop: any) => prop.name === '_wallet'
@@ -38,66 +24,58 @@ const orderPaidHandler = async (
       (prop: any) => prop.name === '_token_gate_id'
     )?.value;
 
-    const productName = item.name.toLowerCase().trim();
+    const productId = item.product_id;
 
-    const tknGate = await TokenGateModel.findOne({
-      productName: productName,
+    await OrderPaidModel.create({
+      globalId: id,
+      productId: productId,
+      orderNumber: orderNumber,
+      walletUsed: walletUsed,
+      tokenId: tokenId,
+      tokenGateId: tokenGateId,
+      fufilled: false,
+      burned: false,
     });
 
-    if (!tknGate) {
-      console.error('Product name not found');
-    } else {
-      const contractAddress = tknGate.contractAddress;
+    // await getMetadataByTokenId(contractAddress, tokenId).then(
+    //   async (json: any) => {
+    //     json.attributes.push({
+    //       trait_type: 'Order Number',
+    //       value: orderNumber,
+    //     });
 
-      await OrderPaidModel.create({
-        id,
-        orderNumber,
-        walletUsed,
-        tokenId,
-        tokenGateId,
-        burnContractAddress: contractAddress,
-      });
+    //     json.attributes.push({
+    //       trait_type: 'Claimee',
+    //       value: walletUsed,
+    //     });
 
-      await getMetadataByTokenId(contractAddress, tokenId).then(
-        async (json: any) => {
-          json.attributes.push({
-            trait_type: 'Order Number',
-            value: orderNumber,
-          });
+    //     json.attributes.push({
+    //       trait_type: 'Claim Token Address',
+    //       value: contractAddress,
+    //     });
 
-          json.attributes.push({
-            trait_type: 'Claimee',
-            value: walletUsed,
-          });
+    //     json.attributes.push({
+    //       trait_type: 'Claim Token ID',
+    //       value: tokenId,
+    //     });
 
-          json.attributes.push({
-            trait_type: 'Claim Token Address',
-            value: contractAddress,
-          });
-
-          json.attributes.push({
-            trait_type: 'Claim Token ID',
-            value: tokenId,
-          });
-
-          await updateMetadataForToken(
-            contractAddress,
-            tokenId,
-            JSON.stringify(json)
-          )
-            .then((result) => {
-              console.log(
-                `JSON data updated for ${contractAddress}-${tokenId}`
-              );
-            })
-            .catch((error) => {
-              console.error(
-                `Couldn't update metadata for ${contractAddress}-${tokenId}: ${error}`
-              );
-            });
-        }
-      );
-    }
+    //     await updateMetadataForToken(
+    //       contractAddress,
+    //       tokenId,
+    //       JSON.stringify(json)
+    //     )
+    //       .then((result) => {
+    //         console.log(
+    //           `JSON data updated for ${contractAddress}-${tokenId}`
+    //         );
+    //       })
+    //       .catch((error) => {
+    //         console.error(
+    //           `Couldn't update metadata for ${contractAddress}-${tokenId}: ${error}`
+    //         );
+    //       });
+    //   }
+    // );
   });
 };
 

@@ -16,7 +16,7 @@ export async function getStoredNFTMetadata(nftContractAddress: string) {}
 export async function getNFTMetadata(
   nftContractAddress: string,
   tokenId: string
-) {
+): Promise<any> {
   try {
     const options = {
       method: 'GET',
@@ -61,6 +61,8 @@ export async function getNFTMetadata(
       } else {
         return reject(`Couldn't scrape IPFS/Arweave for data`);
       }
+
+      return resolve({});
     });
   } catch (error: any) {
     console.error('Error fetching NFT metadata:', error.message);

@@ -65,11 +65,8 @@ There are two different ways to use this app:
 
 ### TODO
 
-- Extend ERC721 side of functinality as this was put on backburner for the burning mech.
-  - Make the app easy to set up with shopify UI
-  - Pass in contract & product ID, and extract all existing metadata / store it
-  - UI for manually updating metadata
-  - UI for getting all unclaimed
-  - UI for debugging
-  - UI for showing DB stored info ab an order
-  - GQL UI
+- Admin UI
+- Debug UI
+- Preview NFT metadata
+- Publish NFT metadata
+- Update docs with workflow, and setup guides

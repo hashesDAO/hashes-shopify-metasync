@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import {
   configureProductsForBurnRedeem,
+  getMetadataPreviewForOrder,
   storeBurnEvents,
 } from '../services/AdminService';
 
@@ -32,19 +33,17 @@ adminRoute.post('/admin/refresh_burns/', async (req, res) => {
       res.status(500).json({ error: 'Failed to sync burn events ' });
     });
 });
-// TODO:
-// loop through configureProductsForBurnRedeem
-// call getTransactionHashesForMint(redeemAssetAddress) and then loop through res
-// save the redeemedId here
-// calling getBurnedErc1155ForTx(burnAssetAddress, txHash)
-// save the burnedId here
-// we should have redeemAddress redeemTokenId burnAddress burnedId
-// find all orderSchemas where burnedId and burnContractAddress match ?? double check this
-// update metadata on those
-// fufill orders
 
-// make a checkForNewBurns endpoint and save all burns to database
-// get metadata for orderNumber debug endpoint
+// Gets metadata from IPFS for a given contract addr
+adminRoute.get('/admin/metadata_preview/:orderId', async (req, res) => {
+  const { orderId } = req.params;
 
-//TODO: push to ipfs endpoints
+  await getMetadataPreviewForOrder(orderId)
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    });
+});
 export default adminRoute;

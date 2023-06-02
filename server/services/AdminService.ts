@@ -6,6 +6,7 @@ import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import BurnToRedeemModel from '../../utils/models/BurnToRedeemModel';
 import {
   getBurnedErc1155ForTx,
+  getNFTMetadata,
   getTransactionHashesForMint,
 } from './NftService';
 
@@ -49,9 +50,6 @@ export async function configureProductsForBurnRedeem(
   return promises;
 }
 
-// make a checkForNewBurns endpoint and save all burns to database
-// get metadata for orderNumber debug endpoint
-
 export async function storeBurnEvents() {
   const orders = await OrderPaidModel.find({ fufilled: false });
 
@@ -71,10 +69,18 @@ export async function storeBurnEvents() {
       const redeemToken = tx.token_id;
       const redeemTx = tx.transaction;
 
+      const burnedToken = await getBurnedErc1155ForTx(
+        burnContractAddress,
+        redeemTx
+      );
+
+      console.log(burnedToken);
+
       const order = orders.find(
         (order: any) =>
           order.productId === element.productId &&
-          order.walletUsed === tx.mintee
+          order.walletUsed === tx.mintee &&
+          order.tokenId.toString() === burnedToken
       );
 
       if (order) {
@@ -116,7 +122,44 @@ export async function storeBurnEvents() {
   return promises;
 }
 
-// TODO: getMetadata thats stored in DB, loop through all orders, grab burned data, and update metadata/push to ipfs
+export async function getMetadataPreviewForOrder(orderNumber: string) {
+  try {
+    const burnRedeemModel = await BurnToRedeemModel.findOne({
+      orderNumber: orderNumber,
+    });
+
+    if (burnRedeemModel) {
+      const metadataPreUpdate = await getNFTMetadata(
+        burnRedeemModel.redeemContractAddress,
+        burnRedeemModel.redeemedTokenId.toString()
+      );
+
+      metadataPreUpdate.attributes.push({
+        trait_type: 'Order Number',
+        value: orderNumber,
+      });
+
+      metadataPreUpdate.attributes.push({
+        trait_type: 'Burned Token Address',
+        value: burnRedeemModel.burnContractAddress,
+      });
+
+      metadataPreUpdate.attributes.push({
+        trait_type: 'Burned Token ID',
+        value: burnRedeemModel.burnedTokenId,
+      });
+
+      return metadataPreUpdate;
+    }
+    return '';
+  } catch (e) {
+    return `Unable to get metadata for order ${orderNumber} - ${e}`;
+  }
+}
+
+//TODO: push to ipfs, get ipfs link for preview , pin?
+//TODO: fufill orders or tag them
+
 export async function updateOSMetadataForToken(
   contractAddress: string,
   tokenId: Number

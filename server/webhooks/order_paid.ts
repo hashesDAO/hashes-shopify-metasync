@@ -36,46 +36,6 @@ const orderPaidHandler = async (
       fufilled: false,
       burned: false,
     });
-
-    // await getMetadataByTokenId(contractAddress, tokenId).then(
-    //   async (json: any) => {
-    //     json.attributes.push({
-    //       trait_type: 'Order Number',
-    //       value: orderNumber,
-    //     });
-
-    //     json.attributes.push({
-    //       trait_type: 'Claimee',
-    //       value: walletUsed,
-    //     });
-
-    //     json.attributes.push({
-    //       trait_type: 'Claim Token Address',
-    //       value: contractAddress,
-    //     });
-
-    //     json.attributes.push({
-    //       trait_type: 'Claim Token ID',
-    //       value: tokenId,
-    //     });
-
-    //     await updateMetadataForToken(
-    //       contractAddress,
-    //       tokenId,
-    //       JSON.stringify(json)
-    //     )
-    //       .then((result) => {
-    //         console.log(
-    //           `JSON data updated for ${contractAddress}-${tokenId}`
-    //         );
-    //       })
-    //       .catch((error) => {
-    //         console.error(
-    //           `Couldn't update metadata for ${contractAddress}-${tokenId}: ${error}`
-    //         );
-    //       });
-    //   }
-    // );
   });
 };
 

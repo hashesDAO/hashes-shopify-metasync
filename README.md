@@ -67,6 +67,5 @@ There are two different ways to use this app:
 
 - Admin UI
 - Debug UI
-- Preview NFT metadata
 - Publish NFT metadata
 - Update docs with workflow, and setup guides

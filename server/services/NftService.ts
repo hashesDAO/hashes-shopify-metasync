@@ -13,7 +13,7 @@ export async function storeNFTMetadata(address: string) {}
 export async function getStoredNFTMetadata(nftContractAddress: string) {}
 
 //TODO: map this to an object and catch errors
-export async function getNFTMetadata(
+export async function getNFTMetadataByToken(
   nftContractAddress: string,
   tokenId: string
 ): Promise<any> {

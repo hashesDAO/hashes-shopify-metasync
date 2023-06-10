@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  getNFTMetadata,
+  getNFTMetadataByToken,
   getTransactionHashesForMint,
   getBurnedErc1155ForTx,
 } from '../services/NftService';
@@ -11,7 +11,7 @@ const nftRoute = Router();
 nftRoute.get('/metadata/:contractAddress/:tokenId', async (req, res) => {
   const { contractAddress, tokenId } = req.params;
 
-  await getNFTMetadata(contractAddress, tokenId)
+  await getNFTMetadataByToken(contractAddress, tokenId)
     .then((result) => {
       res.json({ result });
     })

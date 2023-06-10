@@ -11,21 +11,32 @@ const HomePage = () => {
   return (
     <Page title="Home">
       <Layout>
-        <Layout.Section fullWidth>
+        <Layout.Section oneHalf>
           <LegacyCard
-            title="Debug Cards"
+            title="Admin"
             sectioned
             primaryFooterAction={{
-              content: 'Debug Cards',
+              content: 'Admin',
+              onAction: () => {
+                navigate('/Admin');
+              },
+            }}
+          >
+            <p>Admin controls</p>
+          </LegacyCard>
+        </Layout.Section>
+        <Layout.Section oneHalf>
+          <LegacyCard
+            title="Debug"
+            sectioned
+            primaryFooterAction={{
+              content: 'Debug',
               onAction: () => {
                 navigate('/debug');
               },
             }}
           >
-            <p>
-              Explore how the repository handles data fetching from the backend,
-              App Proxy, making GraphQL requests, Billing API and more.
-            </p>
+            <p>Debug endpoints</p>
           </LegacyCard>
         </Layout.Section>
       </Layout>

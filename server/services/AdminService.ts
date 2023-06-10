@@ -6,9 +6,10 @@ import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import BurnToRedeemModel from '../../utils/models/BurnToRedeemModel';
 import {
   getBurnedErc1155ForTx,
-  getNFTMetadata,
+  getNFTMetadataByToken,
   getTransactionHashesForMint,
 } from './NftService';
+import { GraphqlClient } from '@shopify/shopify-api/lib/clients/graphql/graphql_client';
 
 export async function configureProductsForBurnRedeem(
   responseRequestBody: string
@@ -50,7 +51,15 @@ export async function configureProductsForBurnRedeem(
   return promises;
 }
 
-export async function storeBurnEvents() {
+export async function getConfiguredProducts() {
+  return await ProductContractModel.find();
+}
+
+export async function getburnEvents() {
+  return await BurnToRedeemModel.find();
+}
+
+export async function storeBurnEvents(client: GraphqlClient) {
   const orders = await OrderPaidModel.find({ fufilled: false });
 
   const productContracts = await ProductContractModel.find();
@@ -108,6 +117,7 @@ export async function storeBurnEvents() {
                   },
                   { $set: { burned: true } }
                 );
+
                 resolve(true);
               })
               .catch((error) => {
@@ -129,7 +139,7 @@ export async function getMetadataPreviewForOrder(orderNumber: string) {
     });
 
     if (burnRedeemModel) {
-      const metadataPreUpdate = await getNFTMetadata(
+      const metadataPreUpdate = await getNFTMetadataByToken(
         burnRedeemModel.redeemContractAddress,
         burnRedeemModel.redeemedTokenId.toString()
       );
@@ -155,6 +165,15 @@ export async function getMetadataPreviewForOrder(orderNumber: string) {
   } catch (e) {
     return `Unable to get metadata for order ${orderNumber} - ${e}`;
   }
+}
+
+export async function storeAllMetadata() {
+  // get all redeem addresses,
+  // get all burnredeemmodels
+  // simplehash for all tokens
+  // loop through tokens checking burnredeem for redeemtokenId
+  // if it exists, update the attributes
+  // push to IPFS or push to a directory then upload to ipfs
 }
 
 //TODO: push to ipfs, get ipfs link for preview , pin?

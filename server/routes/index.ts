@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import clientProvider from '../../utils/clientProvider';
 import nftRoute from './nftHandler';
+import adminRoute from './adminHandler';
 
 const userRoutes = Router();
 userRoutes.use(nftRoute);
-
-// TODO: create routes for getting burned tokens and fufilling their orders
+userRoutes.use(adminRoute);
 
 userRoutes.get('/api', (req, res) => {
   const sendData = { text: 'This is coming from /apps/api route.' };

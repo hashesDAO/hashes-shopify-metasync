@@ -1,18 +1,97 @@
 import 'dotenv/config';
 import fetch from 'node-fetch';
 
-import { Erc1155Abi } from '../../utils/abi/erc1155Abi';
+import { Erc721Abi } from '../../utils/abi/erc721Abi';
+
 import { ethers } from 'ethers';
+import TokenMetadataFieldModel from '../../utils/models/TokenMetadataFieldModel';
 
-//TODO: create a manual upload process just in case
-//TODO: method for uploading data to IPFS
-
-// TODO: call getNftMetadata and store each res to the database
 export async function storeNFTMetadata(address: string) {}
 
 export async function getStoredNFTMetadata(nftContractAddress: string) {}
 
-//TODO: map this to an object and catch errors
+// Stores a custom field on a token basis to mongo
+export async function addCustomMetadataFieldPerToken(
+  responseRequestBody: string
+) {
+  const jsonReponse = JSON.parse(responseRequestBody);
+  const promises: Promise<any>[] = [];
+
+  jsonReponse?.tokens.forEach(async (token: any) => {
+    const contractAddr = token.tokenGateAddress;
+    const tokenId = token.tokenId;
+    const metadataKey = token.metadataKey;
+    const metadataValue = token.metadataValue;
+
+    promises.push(
+      new Promise(async (resolve, reject) => {
+        await TokenMetadataFieldModel.updateOne(
+          {
+            burnContractAddress: contractAddr,
+            tokenId: tokenId,
+            metadataKey: metadataKey,
+          },
+          {
+            $set: {
+              metadataValue: metadataValue,
+              burnContractAddress: contractAddr,
+            },
+          },
+          { upsert: true }
+        )
+          .then((result) => {
+            resolve(true);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      })
+    );
+  });
+
+  return promises;
+}
+
+export async function removeCustomMetadataFieldPerToken(
+  responseRequestBody: string
+) {
+  const jsonReponse = JSON.parse(responseRequestBody);
+  const promises: Promise<any>[] = [];
+
+  jsonReponse?.tokens.forEach(async (token: any) => {
+    const contractAddr = token.tokenGateAddress;
+    const tokenId = token.tokenId;
+    const metadataKey = token.metadataKey;
+
+    promises.push(
+      new Promise(async (resolve, reject) => {
+        await TokenMetadataFieldModel.deleteOne({
+          burnContractAddress: contractAddr,
+          tokenId: tokenId,
+          metadataKey: metadataKey,
+        })
+          .then((result) => {
+            resolve(true);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      })
+    );
+  });
+
+  return promises;
+}
+export async function customMetadataByTokenId(
+  tokenGateAddress: string,
+  tokenId: string
+) {
+  return await TokenMetadataFieldModel.find({
+    burnContractAddress: tokenGateAddress,
+    tokenId: tokenId,
+  });
+}
+
 export async function getNFTMetadataByToken(
   nftContractAddress: string,
   tokenId: string
@@ -120,7 +199,7 @@ export async function fetchTransactions(url: string, dataArr: any[]) {
 }
 
 //TODO: error handling and logging
-export async function getBurnedErc1155ForTx(
+export async function getBurnedErc721ForTx(
   burnAssetAddress: string,
   transactionHash: string
 ) {
@@ -131,7 +210,7 @@ export async function getBurnedErc1155ForTx(
     const logs = (await provider.getTransactionReceipt(transactionHash)).logs;
 
     // Get the contract instance
-    const interFaceAbi = new ethers.utils.Interface(Erc1155Abi);
+    const interFaceAbi = new ethers.utils.Interface(Erc721Abi);
 
     // Filter the logs based on the address field
     const filteredLogs = logs.find(
@@ -142,7 +221,7 @@ export async function getBurnedErc1155ForTx(
       return false;
     }
 
-    return interFaceAbi.parseLog(filteredLogs).args.id.toString();
+    return interFaceAbi.parseLog(filteredLogs).args.tokenId.toString();
   } catch (error) {
     console.log(error);
   }

@@ -19,10 +19,7 @@ const ConfigureProducts = () => {
   const [savedProducts, setSavedProducts] = useState([]);
   const [productData, setProductData] = useState({
     productId: '',
-    redeemContractAddress: '',
-    burnContractAddress: '',
-    extensionAddress: '',
-    burnTknUrl: '',
+    manifoldId: '',
   });
 
   const fetch = useFetch();
@@ -49,6 +46,7 @@ const ConfigureProducts = () => {
 
       if (json.message) {
         setResponseDataPost(json.message);
+        await getSavedProducts();
       } else {
         setResponseDataPost(json.error);
       }
@@ -76,10 +74,7 @@ const ConfigureProducts = () => {
   function clearForm() {
     setProductData({
       productId: '',
-      redeemContractAddress: '',
-      burnContractAddress: '',
-      extensionAddress: '',
-      burnTknUrl: '',
+      manifoldId: '',
     });
     setResponseDataPost('');
   }
@@ -109,29 +104,6 @@ const ConfigureProducts = () => {
     singular: 'product',
     plural: 'products',
   };
-
-  const columns = [
-    {
-      Header: 'Product ID',
-      accessor: 'productId',
-    },
-    {
-      Header: 'Redeem Contract Address',
-      accessor: 'redeemContractAddress',
-    },
-    {
-      Header: 'Burn Contract Address',
-      accessor: 'burnContractAddress',
-    },
-    {
-      Header: 'Extension Address',
-      accessor: 'extensionAddress',
-    },
-    {
-      Header: 'Burn Token URL',
-      accessor: 'burnTknUrl',
-    },
-  ];
 
   return (
     <Page
@@ -164,7 +136,7 @@ const ConfigureProducts = () => {
                   }}
                 >
                   From manifold studios burn redeem app page, click the burn
-                  redeem for the product
+                  redeem that matches the product we're configuring
                 </Link>{' '}
               </li>
               <li>
@@ -173,17 +145,9 @@ const ConfigureProducts = () => {
                   https://studio.manifold.xyz/apps/2534903479/drop/1055983856/overview
                 </code>
               </li>
-              <li>Copy the value after /drop so in the example: 1055983856</li>
               <li>
-                Copy the following url but replace 1055983856 with the value
-                from last step:{' '}
-                <code>
-                  https://apps.api.manifoldxyz.dev/public/instance/data?id=1055983856
-                </code>
-              </li>
-              <li>
-                You should now have all the proper values to fill in the info
-                below
+                Copy the value after /drop so in the example: 1055983856 - this
+                is your manifold burn app id
               </li>
             </LegacyCard.Section>
           </LegacyCard>
@@ -247,40 +211,13 @@ const ConfigureProducts = () => {
               required={true}
             />
             <TextField
-              label="Redeem Contract Address"
-              value={productData.redeemContractAddress}
+              label="Manifold Burn app ID"
+              value={productData.manifoldId}
               onChange={(newValue) =>
                 setProductData({
                   ...productData,
-                  redeemContractAddress: newValue,
+                  manifoldId: newValue,
                 })
-              }
-              required={true}
-            />
-            <TextField
-              label="Burn Contract Address"
-              value={productData.burnContractAddress}
-              onChange={(newValue) =>
-                setProductData({
-                  ...productData,
-                  burnContractAddress: newValue,
-                })
-              }
-              required={true}
-            />
-            <TextField
-              label="Extension Address"
-              value={productData.extensionAddress}
-              onChange={(newValue) =>
-                setProductData({ ...productData, extensionAddress: newValue })
-              }
-              required={true}
-            />
-            <TextField
-              label="Burn Token URL"
-              value={productData.burnTknUrl}
-              onChange={(newValue) =>
-                setProductData({ ...productData, burnTknUrl: newValue })
               }
               required={true}
             />

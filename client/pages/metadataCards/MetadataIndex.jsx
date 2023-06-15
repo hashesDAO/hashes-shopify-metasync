@@ -3,51 +3,41 @@ import { Layout, LegacyCard, Page } from '@shopify/polaris';
 import { navigate } from 'raviger';
 import React from 'react';
 
-const AdminIndex = () => {
+const MetadataIndex = () => {
   const app = useAppBridge();
   return (
     <Page
-      title="Admin"
-      subtitle="Configuration and admin controls"
+      title="Metadata"
+      subtitle="Metadata controls"
       breadcrumbs={[{ content: 'Home', onAction: () => navigate('/') }]}
     >
       <Layout>
         <Layout.Section fullWidth>
           <LegacyCard
             sectioned
-            title="Configure Products"
-            primaryFooterAction={{
-              content: 'Configure',
-              onAction: () => {
-                navigate('/admin/configure');
-              },
-            }}
-          >
-            <p>Check products configured and configure/update products</p>
-          </LegacyCard>
-          <LegacyCard
-            sectioned
-            title="Burn Events"
+            title="Metadata preview"
             primaryFooterAction={{
               content: 'View',
               onAction: () => {
-                navigate('/admin/burn');
+                navigate('/metadata/preview');
               },
             }}
           >
-            <p>View burns and force refresh burn events</p>
+            <p>Preview metadata for a given order</p>
           </LegacyCard>
           <LegacyCard
             sectioned
-            title="Repair app"
+            title="Add custom metadata"
             primaryFooterAction={{
               content: 'View',
               onAction: () => {
-                navigate('/admin/repair');
+                navigate('/metadata/custom');
               },
             }}
           >
-            <p>Update the apps database with all missed events</p>
+            <p>
+              Add custom metdata on a per token basis. Used for verisart links
+            </p>
           </LegacyCard>
         </Layout.Section>
       </Layout>
@@ -55,4 +45,4 @@ const AdminIndex = () => {
   );
 };
 
-export default AdminIndex;
+export default MetadataIndex;

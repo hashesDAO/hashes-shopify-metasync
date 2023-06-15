@@ -4,7 +4,6 @@ import nftRoute from '../nftHandler';
 
 const proxyRouter = Router();
 
-// proxyRouter.use(adminRoute);
 // proxyRouter.use(nftRoute);
 
 proxyRouter.get('/json', async (req, res) => {

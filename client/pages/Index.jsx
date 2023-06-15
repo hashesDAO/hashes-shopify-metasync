@@ -16,13 +16,25 @@ const HomePage = () => {
             title="Admin"
             sectioned
             primaryFooterAction={{
-              content: 'Admin',
+              content: 'View',
               onAction: () => {
-                navigate('/Admin');
+                navigate('/admin');
               },
             }}
           >
             <p>Admin controls</p>
+          </LegacyCard>
+          <LegacyCard
+            title="Metadata"
+            sectioned
+            primaryFooterAction={{
+              content: 'View',
+              onAction: () => {
+                navigate('/metadata');
+              },
+            }}
+          >
+            <p>Metadata controls</p>
           </LegacyCard>
         </Layout.Section>
         <Layout.Section oneHalf>
@@ -30,7 +42,7 @@ const HomePage = () => {
             title="Debug"
             sectioned
             primaryFooterAction={{
-              content: 'Debug',
+              content: 'View',
               onAction: () => {
                 navigate('/debug');
               },

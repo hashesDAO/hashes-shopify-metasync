@@ -10,7 +10,6 @@ const orderPaidHandler = async (
   const id = jsonReponse.id;
   const orderNumber = jsonReponse.order_number;
 
-  console.log(jsonReponse);
   jsonReponse?.line_items.forEach(async (item: any) => {
     const walletUsed = item.properties.find(
       (prop: any) => prop.name === '_wallet'

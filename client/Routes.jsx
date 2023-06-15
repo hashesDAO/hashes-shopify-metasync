@@ -8,6 +8,10 @@ import Index from './pages/Index';
 import AdminIndex from './pages/adminCards/AdminIndex';
 import ConfigureProducts from './pages/adminCards/ConfigureProducts';
 import BurnEvents from './pages/adminCards/BurnEvents';
+import MetadataPreview from './pages/metadataCards/MetadataPreview';
+import MetadataIndex from './pages/metadataCards/MetadataIndex';
+import CustomMetadataPage from './pages/metadataCards/CustomMetadata';
+import RepairApp from './pages/adminCards/RepairApp';
 
 const routes = {
   '/': () => <Index />,
@@ -15,6 +19,12 @@ const routes = {
   //Admin cards
   '/admin': () => <AdminIndex />,
   '/admin/configure': () => <ConfigureProducts />,
+  '/admin/burn': () => <BurnEvents />,
+  '/admin/repair': () => <RepairApp />,
+  // Metadata Cards
+  '/metadata': () => <MetadataIndex />,
+  '/metadata/preview': () => <MetadataPreview />,
+  '/metadata/custom': () => <CustomMetadataPage />,
   //Debug Cards
   '/debug': () => <DebugIndex />,
   '/debug/activeWebhooks': () => <ActiveWebhooks />,

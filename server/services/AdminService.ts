@@ -5,7 +5,8 @@ import ProductContractModel from '../../utils/models/ProductContractModel';
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import BurnToRedeemModel from '../../utils/models/BurnToRedeemModel';
 import {
-  getBurnedErc1155ForTx,
+  customMetadataByTokenId,
+  getBurnedErc721ForTx,
   getNFTMetadataByToken,
   getTransactionHashesForMint,
 } from './NftService';
@@ -19,13 +20,33 @@ export async function configureProductsForBurnRedeem(
 
   jsonReponse?.products.forEach(async (item: any) => {
     const productId = item.productId;
-    const redeemContractAddress = item.redeemContractAddress;
-    const burnContractAddress = item.burnContractAddress;
-    const extensionAddress = item.extensionAddress;
-    const burnTknUrl = item.burnTknUrl;
+    const manifoldId = item.manifoldId;
+    const options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    };
 
     promises.push(
       new Promise(async (resolve, reject) => {
+        const manifoldRes = await fetch(
+          `https://apps.api.manifoldxyz.dev/public/instance/data?id=${manifoldId}`,
+          options
+        );
+        if (manifoldRes.status !== 200) {
+          console.error('Error fetching NFT metadata:');
+          reject(
+            `Couldn't get manifold info ${manifoldId} :${manifoldRes.statusText}`
+          );
+        }
+        const data = await manifoldRes.json();
+        const burnContractAddress =
+          data.publicData.burnSet[0].items[0].contractAddress;
+        const redeemContractAddress = data.publicData.redeemContractAddress;
+        const extensionAddress = data.publicData.extensionAddress;
+        const burnTknUrl = `https://app.manifold.xyz/br/${data.slug}`;
+
         await ProductContractModel.updateOne(
           { productId: productId }, // Filter criteria
           {
@@ -59,8 +80,13 @@ export async function getburnEvents() {
   return await BurnToRedeemModel.find();
 }
 
-export async function storeBurnEvents(client: GraphqlClient) {
-  const orders = await OrderPaidModel.find({ fufilled: false });
+export async function storeBurnEvents(
+  client: GraphqlClient,
+  includeBurned: boolean
+) {
+  const orders = includeBurned
+    ? await OrderPaidModel.find()
+    : await OrderPaidModel.find({ fufilled: false, burned: false });
 
   const productContracts = await ProductContractModel.find();
   const promises: Promise<any>[] = [];
@@ -78,12 +104,10 @@ export async function storeBurnEvents(client: GraphqlClient) {
       const redeemToken = tx.token_id;
       const redeemTx = tx.transaction;
 
-      const burnedToken = await getBurnedErc1155ForTx(
+      const burnedToken = await getBurnedErc721ForTx(
         burnContractAddress,
         redeemTx
       );
-
-      console.log(burnedToken);
 
       const order = orders.find(
         (order: any) =>
@@ -118,7 +142,32 @@ export async function storeBurnEvents(client: GraphqlClient) {
                   { $set: { burned: true } }
                 );
 
-                resolve(true);
+                client
+                  .query({
+                    data: `mutation {
+                      orderUpdate(input: { id: "gid://shopify/Order/${
+                        order.globalId
+                      }", tags: ${JSON.stringify(['Burned'])} }) {
+                        order {
+                          id
+                          tags
+                        }
+                        userErrors {
+                          field
+                          message
+                        }
+                      }
+                    }
+                  `,
+                  })
+                  .then((response) => {
+                    console.log('Updated Order:', order.orderNumber);
+                    resolve(true);
+                  })
+                  .catch((error) => {
+                    console.error('Error updating order:', error);
+                    reject(error);
+                  });
               })
               .catch((error) => {
                 reject(error);
@@ -132,7 +181,12 @@ export async function storeBurnEvents(client: GraphqlClient) {
   return promises;
 }
 
-export async function getMetadataPreviewForOrder(orderNumber: string) {
+export async function getMetadataPreviewForOrder(
+  orderNumber: string,
+  client: GraphqlClient
+) {
+  await storeBurnEvents(client, false);
+
   try {
     const burnRedeemModel = await BurnToRedeemModel.findOne({
       orderNumber: orderNumber,
@@ -143,6 +197,20 @@ export async function getMetadataPreviewForOrder(orderNumber: string) {
         burnRedeemModel.redeemContractAddress,
         burnRedeemModel.redeemedTokenId.toString()
       );
+      const burnContractAddress = burnRedeemModel.burnContractAddress;
+      const burnTokenId = burnRedeemModel.burnedTokenId;
+
+      const customMetadataForToken = await customMetadataByTokenId(
+        burnContractAddress,
+        burnTokenId.toString()
+      );
+
+      customMetadataForToken.forEach((element) => {
+        metadataPreUpdate.attributes.push({
+          trait_type: element.metadataKey,
+          value: element.metadataValue,
+        });
+      });
 
       metadataPreUpdate.attributes.push({
         trait_type: 'Order Number',
@@ -151,17 +219,21 @@ export async function getMetadataPreviewForOrder(orderNumber: string) {
 
       metadataPreUpdate.attributes.push({
         trait_type: 'Burned Token Address',
-        value: burnRedeemModel.burnContractAddress,
+        value: burnContractAddress,
       });
 
       metadataPreUpdate.attributes.push({
         trait_type: 'Burned Token ID',
-        value: burnRedeemModel.burnedTokenId,
+        value: burnTokenId,
       });
 
-      return metadataPreUpdate;
+      return {
+        tokenId: burnRedeemModel.redeemedTokenId,
+        metadata: metadataPreUpdate,
+      };
+    } else {
+      return `Token for order ${orderNumber}, not yet burned`;
     }
-    return '';
   } catch (e) {
     return `Unable to get metadata for order ${orderNumber} - ${e}`;
   }
@@ -177,7 +249,122 @@ export async function storeAllMetadata() {
 }
 
 //TODO: push to ipfs, get ipfs link for preview , pin?
-//TODO: fufill orders or tag them
+
+// Grabs all orders and stores them to the database.
+// checks for all burn redeems and updates tags
+export async function updateEverything(client: GraphqlClient) {
+  let hasNextPage = true;
+  let endCursor = null;
+  let throttleTimeout = 500;
+
+  try {
+    while (hasNextPage) {
+      let query: any = `
+      query MyQuery {
+        orders(first: 10, after:  ${endCursor ? `"${endCursor}"` : 'null'}) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            name
+            id
+            lineItems(first: 10) {
+              edges {
+                node {
+                  name
+                  product {
+                    id
+                  }
+                  customAttributes {
+                    key
+                    value
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+      await new Promise((resolve) => setTimeout(resolve, throttleTimeout)); // Implement rate limiting
+
+      const response: any = await client.query({ data: query });
+
+      if (
+        response.body.data &&
+        response.body.data.orders &&
+        response.body.data.orders.nodes
+      ) {
+        const orders = response.body.data.orders.nodes;
+
+        orders.forEach((order: any) => {
+          const orderId = order.id.match(/Order\/(.*)$/)[1];
+          const orderNumber = parseInt(order.name.slice(1));
+
+          if (order.lineItems && order.lineItems.edges) {
+            const lineItems = order.lineItems.edges;
+
+            lineItems.forEach(async (lineItem: any) => {
+              const productId =
+                lineItem.node.product.id.match(/Product\/(.*)$/)[1];
+              const lineItemCustomAttributes = lineItem.node.customAttributes;
+
+              if (lineItemCustomAttributes) {
+                const walletUsed = lineItemCustomAttributes.find(
+                  (prop: any) => prop.key === '_wallet'
+                )?.value;
+
+                const tokenId = lineItemCustomAttributes.find(
+                  (prop: any) => prop.key === 'Token ID'
+                )?.value;
+
+                const tokenGateId = lineItemCustomAttributes.find(
+                  (prop: any) => prop.key === '_token_gate_id'
+                )?.value;
+
+                const existingOrder = await OrderPaidModel.find({
+                  productId: productId,
+                  orderNumber: orderNumber,
+                  tokenId: tokenId,
+                });
+
+                if (existingOrder.length === 0) {
+                  await OrderPaidModel.create({
+                    globalId: orderId,
+                    productId: productId,
+                    orderNumber: orderNumber,
+                    walletUsed: walletUsed,
+                    tokenId: tokenId,
+                    tokenGateId: tokenGateId,
+                    fufilled: false,
+                    burned: false,
+                  }).catch((error) => {
+                    console.log('Already added');
+                  });
+                }
+              }
+            });
+          }
+        });
+
+        hasNextPage = response.body.data.orders.pageInfo.hasNextPage;
+        endCursor = response.body.data.orders.pageInfo.endCursor;
+
+        throttleTimeout = 500; // Reset the throttle timeout to 500 milliseconds for the next request
+      } else {
+        return Promise.reject(response);
+        break;
+      }
+    }
+  } catch (error) {
+    console.error('GraphQL request error:', error);
+    return Promise.reject(error);
+  }
+
+  return await storeBurnEvents(client, true);
+}
 
 export async function updateOSMetadataForToken(
   contractAddress: string,

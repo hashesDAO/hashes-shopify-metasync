@@ -4,7 +4,7 @@ import { navigate } from 'raviger';
 
 import useFetch from '../../hooks/useFetch';
 
-const RepairApp = () => {
+const OpenseaUpdate = () => {
   const [responseBody, setResponseBody] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -14,7 +14,7 @@ const RepairApp = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch('/admin/repair', {
+      const response = await fetch('/admin/updateOS', {
         method: 'POST',
       });
       const json = await response.json();
@@ -28,18 +28,16 @@ const RepairApp = () => {
 
   return (
     <Page
-      title="Repair App"
-      breadcrumbs={[{ content: 'Home', onAction: () => navigate('/admin') }]}
+      title="Opensea refresh"
+      breadcrumbs={[{ content: 'Home', onAction: () => navigate('/metadata') }]}
     >
       <LegacyCard sectioned>
         <p>
-          Loops through every order, storing necessary info to the database.
-          Then checks all orders for burns that occured, and tags those orders
-          with "burned". To be used if the app crashes, or if you forgot to run
-          ConfigureProducts before allowing purchases
+          Send a request to update all metadata for the burn to redeem
+          collections
         </p>
         <Button onClick={handleRepair} disabled={isLoading}>
-          {isLoading ? <Spinner size="small" /> : 'Repair'}
+          {isLoading ? <Spinner size="small" /> : 'Refresh metadata'}
         </Button>
       </LegacyCard>
       {responseBody && (
@@ -51,4 +49,4 @@ const RepairApp = () => {
   );
 };
 
-export default RepairApp;
+export default OpenseaUpdate;

@@ -32,6 +32,7 @@
     "@shopify/post-purchase-ui-extensions-react": "^0.13.4",
     "@shopify/shopify-api": "^7.0.0",
     "aws-sdk": "^2.1381.0",
+    "axios": "^1.4.0",
     "compression": "^1.7.4",
     "cryptr": "^6.2.0",
     "dotenv": "^16.0.3",

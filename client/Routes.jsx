@@ -12,6 +12,8 @@ import MetadataPreview from './pages/metadataCards/MetadataPreview';
 import MetadataIndex from './pages/metadataCards/MetadataIndex';
 import CustomMetadataPage from './pages/metadataCards/CustomMetadata';
 import RepairApp from './pages/adminCards/RepairApp';
+import OpenseaUpdate from './pages/metadataCards/OpenseaUpdate';
+import UploadToIPFS from './pages/metadataCards/UploadToIpfs';
 
 const routes = {
   '/': () => <Index />,
@@ -25,6 +27,8 @@ const routes = {
   '/metadata': () => <MetadataIndex />,
   '/metadata/preview': () => <MetadataPreview />,
   '/metadata/custom': () => <CustomMetadataPage />,
+  '/metadata/refresh': () => <OpenseaUpdate />,
+  '/metadata/ipfs': () => <UploadToIPFS />,
   //Debug Cards
   '/debug': () => <DebugIndex />,
   '/debug/activeWebhooks': () => <ActiveWebhooks />,

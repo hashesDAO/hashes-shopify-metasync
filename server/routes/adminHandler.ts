@@ -4,8 +4,10 @@ import {
   configureProductsForBurnRedeem,
   getConfiguredProducts,
   getburnEvents,
+  storeAllMetadata,
   storeBurnEvents,
   updateEverything,
+  updateMetadataForAllProducts,
 } from '../services/AdminService';
 import clientProvider from '../../utils/clientProvider';
 
@@ -80,4 +82,25 @@ adminRoute.post('/admin/repair', async (req, res) => {
     });
 });
 
+adminRoute.post('/admin/updateOS', async (req, res) => {
+  await updateMetadataForAllProducts();
+  res.json({ success: true, message: 'Request to update metadata success' });
+});
+
+adminRoute.post('/admin/upload_ipfs', async (req, res) => {
+  const { client } = await clientProvider.graphqlClient({
+    req,
+    res,
+    isOnline: true,
+  });
+
+  const promise = await storeAllMetadata(client);
+  Promise.all(promise)
+    .then((result: any) => {
+      res.json({ success: true, message: `IPFS CID: ${result}` });
+    })
+    .catch((err: any) => {
+      res.status(500).json({ error: err });
+    });
+});
 export default adminRoute;

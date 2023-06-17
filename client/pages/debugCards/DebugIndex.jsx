@@ -26,23 +26,6 @@ const DebugIndex = () => {
             <p>Explore registered webhooks and endpoints.</p>
           </LegacyCard>
         </Layout.Section>
-        <Layout.Section oneHalf>
-          <LegacyCard
-            sectioned
-            title="Data Fetching"
-            primaryFooterAction={{
-              content: 'Explore',
-              onAction: () => {
-                navigate('/debug/getData');
-              },
-            }}
-          >
-            <p>
-              Run GET and POST requests to your server along with GraphQL
-              queries.
-            </p>
-          </LegacyCard>
-        </Layout.Section>
       </Layout>
     </Page>
   );

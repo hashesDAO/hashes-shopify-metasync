@@ -6,10 +6,6 @@ import { Erc721Abi } from '../../utils/abi/erc721Abi';
 import { ethers } from 'ethers';
 import TokenMetadataFieldModel from '../../utils/models/TokenMetadataFieldModel';
 
-export async function storeNFTMetadata(address: string) {}
-
-export async function getStoredNFTMetadata(nftContractAddress: string) {}
-
 // Stores a custom field on a token basis to mongo
 export async function addCustomMetadataFieldPerToken(
   responseRequestBody: string
@@ -224,5 +220,41 @@ export async function getBurnedErc721ForTx(
     return interFaceAbi.parseLog(filteredLogs).args.tokenId.toString();
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function getTotalSupply(contractAddress: string) {
+  try {
+    const options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'X-API-KEY': process.env.SIMPLEHASH_API_KEY as string,
+      },
+    };
+
+    const simpleHashRes = await fetch(
+      `https://api.simplehash.com/api/v0/nfts/collections/ethereum/${contractAddress}`,
+      options
+    );
+
+    if (simpleHashRes.status !== 200) {
+      console.error('Error getting collection size');
+      return null;
+    }
+
+    const data = await simpleHashRes.json();
+
+    if (data.collections && data.collections.length > 0) {
+      const collection = data.collections[0];
+      const totalQuantity = collection.total_quantity;
+
+      return totalQuantity;
+    }
+
+    return null;
+  } catch (error: any) {
+    console.error('Error fetching colection size', error.message);
+    return null;
   }
 }

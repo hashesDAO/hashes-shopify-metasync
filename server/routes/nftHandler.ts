@@ -5,6 +5,7 @@ import {
   getBurnedErc721ForTx,
   addCustomMetadataFieldPerToken,
   removeCustomMetadataFieldPerToken,
+  getTotalSupply,
 } from '../services/NftService';
 import { getMetadataPreviewForOrder } from '../../server/services/AdminService';
 import clientProvider from '../../utils/clientProvider';
@@ -97,6 +98,14 @@ nftRoute.get('/burned_id/:burnAssetAddress/:tx', async (req, res) => {
     .catch((error) => {
       res.status(500).json({ error: error });
     });
+});
+
+nftRoute.get('/total_supply/:address/', async (req, res) => {
+  const { address } = req.params;
+
+  await getTotalSupply(address).then((result) => {
+    res.json(result);
+  });
 });
 
 export default nftRoute;

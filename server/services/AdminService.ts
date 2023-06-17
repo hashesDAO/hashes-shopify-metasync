@@ -1,5 +1,7 @@
 import 'dotenv/config';
 import fetch from 'node-fetch';
+import axios from 'axios';
+import FormData from 'form-data';
 
 import ProductContractModel from '../../utils/models/ProductContractModel';
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
@@ -8,6 +10,7 @@ import {
   customMetadataByTokenId,
   getBurnedErc721ForTx,
   getNFTMetadataByToken,
+  getTotalSupply,
   getTransactionHashesForMint,
 } from './NftService';
 import { GraphqlClient } from '@shopify/shopify-api/lib/clients/graphql/graphql_client';
@@ -78,6 +81,14 @@ export async function getConfiguredProducts() {
 
 export async function getburnEvents() {
   return await BurnToRedeemModel.find();
+}
+
+export async function updateMetadataForAllProducts() {
+  const products = await getConfiguredProducts();
+
+  products.forEach(async (product) => {
+    await updateOSMetadataForCollection(product.redeemContractAddress);
+  });
 }
 
 export async function storeBurnEvents(
@@ -239,19 +250,111 @@ export async function getMetadataPreviewForOrder(
   }
 }
 
-export async function storeAllMetadata() {
-  // get all redeem addresses,
-  // get all burnredeemmodels
-  // simplehash for all tokens
-  // loop through tokens checking burnredeem for redeemtokenId
-  // if it exists, update the attributes
-  // push to IPFS or push to a directory then upload to ipfs
+export async function storeAllMetadata(client: GraphqlClient) {
+  await storeBurnEvents(client, false);
+
+  const products = await getConfiguredProducts();
+  const uploadPromises = [];
+
+  for (const product of products) {
+    const uploadPromise = new Promise(async (resolve, reject) => {
+      const redeemedTokenAddress = product.redeemContractAddress;
+      const burnedTokenAddress = product.burnContractAddress;
+      const totalRedeemedQuantity = await getTotalSupply(redeemedTokenAddress);
+      const files = [];
+
+      for (let i = 1; i <= totalRedeemedQuantity; i++) {
+        const burnRedeemModel = await BurnToRedeemModel.findOne({
+          burnContractAddress: burnedTokenAddress,
+          redeemContractAddress: redeemedTokenAddress,
+          redeemedTokenId: i,
+        });
+
+        const metadata = await getNFTMetadataByToken(
+          redeemedTokenAddress,
+          i.toString()
+        );
+
+        if (burnRedeemModel) {
+          const burnTokenId = burnRedeemModel.burnedTokenId;
+
+          const customMetadataForToken = await customMetadataByTokenId(
+            burnedTokenAddress,
+            burnTokenId.toString()
+          );
+
+          customMetadataForToken.forEach((element) => {
+            metadata.attributes.push({
+              trait_type: element.metadataKey,
+              value: element.metadataValue,
+            });
+          });
+
+          metadata.attributes.push({
+            trait_type: 'Order Number',
+            value: burnRedeemModel.orderNumber,
+          });
+
+          metadata.attributes.push({
+            trait_type: 'Burned Token Address',
+            value: burnedTokenAddress,
+          });
+
+          metadata.attributes.push({
+            trait_type: 'Burned Token ID',
+            value: burnTokenId.toString(),
+          });
+        }
+
+        const fileData = JSON.stringify(metadata);
+        const fileName = `/${redeemedTokenAddress}/${i}`;
+
+        //TODO: store in mongo with address and ipfs link
+        files.push({
+          fileName,
+          fileData,
+        });
+      }
+
+      try {
+        const formData = new FormData();
+        files.forEach((file) => {
+          formData.append('file', file.fileData, file.fileName);
+        });
+
+        const response = await axios.post(
+          'https://api.nft.storage/upload',
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.NFT_STORAGE_API_KEY}`, // Replace with your NFT.Storage API key
+              ...formData.getHeaders(),
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const data = response.data;
+          const cid = data.value.cid;
+          const imageUrl = 'https://ipfs.io/ipfs/' + cid;
+          resolve(imageUrl);
+        } else {
+          reject(
+            new Error(`Failed to upload directory. Status: ${response.status}`)
+          );
+        }
+      } catch (error) {
+        console.error('Error uploading directory:', error);
+        reject(error);
+      }
+    });
+
+    uploadPromises.push(uploadPromise);
+  }
+
+  return uploadPromises;
 }
 
-//TODO: push to ipfs, get ipfs link for preview , pin?
-
-// Grabs all orders and stores them to the database.
-// checks for all burn redeems and updates tags
 export async function updateEverything(client: GraphqlClient) {
   let hasNextPage = true;
   let endCursor = null;

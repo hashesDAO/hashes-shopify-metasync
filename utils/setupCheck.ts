@@ -1,8 +1,8 @@
 const setupCheck = () => {
   const {
-    AWS_ACCESS_KEY: awsKey,
-    AWS_SECRET: awsSecret,
-    AWS_BUCKET: awsBucket,
+    NFT_STORAGE_API_KEY: nftStorageApiKey,
+    SIMPLEHASH_API_KEY: simpleHashApi,
+    MAINNET_RPC: mainnetRpc,
     SHOPIFY_API_KEY: apiKey,
     SHOPIFY_API_SECRET: apiSecret,
     SHOPIFY_API_SCOPES: apiScopes,
@@ -16,6 +16,18 @@ const setupCheck = () => {
 
   let errorCount = 0;
 
+  if (typeof nftStorageApiKey === 'undefined') {
+    console.error('---> NFT.storage API Key is undefined.');
+    errorCount++;
+  }
+  if (typeof simpleHashApi === 'undefined') {
+    console.error('---> Simple hash API Key is undefined.');
+    errorCount++;
+  }
+  if (typeof mainnetRpc === 'undefined') {
+    console.error('---> Mainnet RPC is undefined.');
+    errorCount++;
+  }
   if (typeof apiKey === 'undefined') {
     console.error('---> API Key is undefined.');
     errorCount++;

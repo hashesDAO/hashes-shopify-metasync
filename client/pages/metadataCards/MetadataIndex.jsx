@@ -39,6 +39,32 @@ const MetadataIndex = () => {
               Add custom metdata on a per token basis. Used for verisart links
             </p>
           </LegacyCard>
+          <LegacyCard
+            sectioned
+            title="Upload to IPFS"
+            primaryFooterAction={{
+              content: 'View',
+              onAction: () => {
+                navigate('/metadata/ipfs');
+              },
+            }}
+          >
+            <p>
+              Send a request to upload all redeem collections metadata to IPFS
+            </p>
+          </LegacyCard>
+          <LegacyCard
+            sectioned
+            title="Refresh OS metadata"
+            primaryFooterAction={{
+              content: 'View',
+              onAction: () => {
+                navigate('/metadata/refresh');
+              },
+            }}
+          >
+            <p>Send a request to OS to refresh metadata for collections</p>
+          </LegacyCard>
         </Layout.Section>
       </Layout>
     </Page>

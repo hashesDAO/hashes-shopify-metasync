@@ -230,27 +230,23 @@ export async function getTotalSupply(contractAddress: string) {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        'X-API-KEY': process.env.SIMPLEHASH_API_KEY as string,
       },
     };
 
-    const simpleHashRes = await fetch(
-      `https://api.simplehash.com/api/v0/nfts/collections/ethereum/${contractAddress}`,
+    const looksRareRes = await fetch(
+      `https://api.looksrare.org/api/v1/collections/stats?address=${contractAddress}`,
       options
     );
 
-    if (simpleHashRes.status !== 200) {
+    if (looksRareRes.status !== 200) {
       console.error('Error getting collection size');
       return null;
     }
 
-    const data = await simpleHashRes.json();
+    const data = await looksRareRes.json();
 
-    if (data.collections && data.collections.length > 0) {
-      const collection = data.collections[0];
-      const totalQuantity = collection.total_quantity;
-
-      return totalQuantity;
+    if (data.totalSupply) {
+      return data.totalSupply;
     }
 
     return null;

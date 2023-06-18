@@ -271,7 +271,8 @@ export async function storeAllMetadata(client: GraphqlClient) {
 
       const metadata = await getNFTMetadataByToken(redeemedTokenAddress, '1');
 
-      for (let i = 1; i <= totalRedeemedQuantity; i++) {
+      for (let i = 1; i < totalRedeemedQuantity + 1; i++) {
+        const newMetadata = metadata;
         const burnRedeemModel = await BurnToRedeemModel.findOne({
           burnContractAddress: burnedTokenAddress,
           redeemContractAddress: redeemedTokenAddress,
@@ -287,29 +288,29 @@ export async function storeAllMetadata(client: GraphqlClient) {
           );
 
           customMetadataForToken.forEach((element) => {
-            metadata.attributes.push({
+            newMetadata.attributes.push({
               trait_type: element.metadataKey,
               value: element.metadataValue,
             });
           });
 
-          metadata.attributes.push({
+          newMetadata.attributes.push({
             trait_type: 'Order Number',
             value: burnRedeemModel.orderNumber.toString(),
           });
 
-          metadata.attributes.push({
+          newMetadata.attributes.push({
             trait_type: 'Burned Token Address',
             value: burnedTokenAddress,
           });
 
-          metadata.attributes.push({
+          newMetadata.attributes.push({
             trait_type: 'Burned Token ID',
             value: burnTokenId.toString(),
           });
         }
 
-        const fileData = JSON.stringify(metadata);
+        const fileData = JSON.stringify(newMetadata);
         const fileName = `/${redeemedTokenAddress}/${i}`;
 
         files.push({

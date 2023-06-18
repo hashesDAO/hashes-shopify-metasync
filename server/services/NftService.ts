@@ -243,15 +243,15 @@ export async function getTotalSupply(contractAddress: string) {
       return null;
     }
 
-    const data = await looksRareRes.json();
+    const res = await looksRareRes.json();
 
-    if (data.totalSupply) {
-      return data.totalSupply;
+    if (res.data.totalSupply) {
+      return parseInt(res.data.totalSupply);
     }
 
-    return null;
+    return 0;
   } catch (error: any) {
     console.error('Error fetching colection size', error.message);
-    return null;
+    return 0;
   }
 }

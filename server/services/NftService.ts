@@ -152,18 +152,18 @@ export async function getTransactionHashesForMint(nftContractAddress: string) {
 }
 
 export async function fetchTransactions(url: string, dataArr: any[]) {
-  try {
-    const options = {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'X-API-KEY': process.env.SIMPLEHASH_API_KEY as string,
-      },
-    };
+  return new Promise(async (resolve, reject) => {
+    try {
+      const options = {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'X-API-KEY': process.env.SIMPLEHASH_API_KEY as string,
+        },
+      };
 
-    const simpleHashRes = await fetch(url, options);
+      const simpleHashRes = await fetch(url, options);
 
-    return new Promise(async (resolve, reject) => {
       if (simpleHashRes.status !== 200) {
         console.error('Error fetching NFT metadata:');
         reject(
@@ -188,10 +188,11 @@ export async function fetchTransactions(url: string, dataArr: any[]) {
       } else {
         resolve(dataArr);
       }
-    });
-  } catch (error: any) {
-    console.error('Error fetching NFT metadata:', error.message);
-  }
+    } catch (error: any) {
+      reject(error);
+      console.error('Error fetching NFT metadata:', error.message);
+    }
+  });
 }
 
 //TODO: error handling and logging

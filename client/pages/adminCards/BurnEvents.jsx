@@ -49,6 +49,7 @@ const BurnEvents = () => {
         setResponseDataRefresh(json.error);
       }
 
+      fetchContent();
       setIsPopupOpen(true);
     } catch (error) {
       console.error(error);

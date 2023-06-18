@@ -52,6 +52,7 @@ const UploadToIPFS = () => {
       }
 
       setIsPopupOpen(true);
+      getSavedProducts();
       setLoading(false);
     } catch (error) {
       console.error(error);

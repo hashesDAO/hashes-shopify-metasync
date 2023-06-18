@@ -269,17 +269,14 @@ export async function storeAllMetadata(client: GraphqlClient) {
       const totalRedeemedQuantity = await getTotalSupply(redeemedTokenAddress);
       const files = [];
 
+      const metadata = await getNFTMetadataByToken(redeemedTokenAddress, '1');
+
       for (let i = 1; i <= totalRedeemedQuantity; i++) {
         const burnRedeemModel = await BurnToRedeemModel.findOne({
           burnContractAddress: burnedTokenAddress,
           redeemContractAddress: redeemedTokenAddress,
           redeemedTokenId: i,
         });
-
-        const metadata = await getNFTMetadataByToken(
-          redeemedTokenAddress,
-          i.toString()
-        );
 
         if (burnRedeemModel) {
           const burnTokenId = burnRedeemModel.burnedTokenId;

@@ -298,7 +298,7 @@ export async function storeAllMetadata(client: GraphqlClient) {
 
           metadata.attributes.push({
             trait_type: 'Order Number',
-            value: burnRedeemModel.orderNumber,
+            value: burnRedeemModel.orderNumber.toString(),
           });
 
           metadata.attributes.push({

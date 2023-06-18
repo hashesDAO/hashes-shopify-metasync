@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Page, LegacyCard, Button, Spinner } from '@shopify/polaris';
+import { Page, LegacyCard, Button, Spinner, Modal } from '@shopify/polaris';
 import { navigate } from 'raviger';
 
 import useFetch from '../../hooks/useFetch';
@@ -7,6 +7,7 @@ import useFetch from '../../hooks/useFetch';
 const RepairApp = () => {
   const [responseBody, setResponseBody] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const fetch = useFetch();
 
@@ -19,11 +20,17 @@ const RepairApp = () => {
       });
       const json = await response.json();
       setResponseBody(JSON.stringify(json, null, 2));
+      setIsPopupOpen(true);
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setResponseBody('');
   };
 
   return (
@@ -34,7 +41,7 @@ const RepairApp = () => {
       <LegacyCard sectioned>
         <p>
           Loops through every order, storing necessary info to the database.
-          Then checks all orders for burns that occured, and tags those orders
+          Then checks all orders for burns that occurred, and tags those orders
           with "burned". To be used if the app crashes, or if you forgot to run
           ConfigureProducts before allowing purchases
         </p>
@@ -42,11 +49,19 @@ const RepairApp = () => {
           {isLoading ? <Spinner size="small" /> : 'Repair'}
         </Button>
       </LegacyCard>
-      {responseBody && (
-        <LegacyCard sectioned>
+      <Modal
+        open={isPopupOpen}
+        onClose={handleClosePopup}
+        title="Repair App Response"
+        primaryAction={{
+          content: 'OK',
+          onAction: handleClosePopup,
+        }}
+      >
+        <Modal.Section>
           <pre>{responseBody}</pre>
-        </LegacyCard>
-      )}
+        </Modal.Section>
+      </Modal>
     </Page>
   );
 };

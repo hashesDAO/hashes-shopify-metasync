@@ -22,7 +22,7 @@ adminRoute.post('/admin/configure_products', async (req, res) => {
       res.json({ success: true, message: 'Products successfully configured' });
     })
     .catch((err: any) => {
-      res.status(500).json({ error: 'Failed to configure products' });
+      res.status(500).json({ error: err });
     });
 });
 

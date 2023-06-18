@@ -33,41 +33,47 @@ export async function configureProductsForBurnRedeem(
 
     promises.push(
       new Promise(async (resolve, reject) => {
-        const manifoldRes = await fetch(
-          `https://apps.api.manifoldxyz.dev/public/instance/data?id=${manifoldId}`,
-          options
-        );
-        if (manifoldRes.status !== 200) {
-          console.error('Error fetching NFT metadata:');
-          reject(
-            `Couldn't get manifold info ${manifoldId} :${manifoldRes.statusText}`
+        try {
+          const manifoldRes = await fetch(
+            `https://apps.api.manifoldxyz.dev/public/instance/data?id=${manifoldId}`,
+            options
           );
-        }
-        const data = await manifoldRes.json();
-        const burnContractAddress =
-          data.publicData.burnSet[0].items[0].contractAddress;
-        const redeemContractAddress = data.publicData.redeemContractAddress;
-        const extensionAddress = data.publicData.extensionAddress;
-        const burnTknUrl = `https://app.manifold.xyz/br/${data.slug}`;
+          if (manifoldRes.status !== 200) {
+            console.error('Error fetching NFT metadata:');
+            reject(
+              `Couldn't get manifold info ${manifoldId} :${manifoldRes.statusText}`
+            );
+          }
+          const data = await manifoldRes.json();
+          const burnContractAddress =
+            data.publicData.burnSet[0].items[0].contractAddress;
+          const redeemContractAddress = data.publicData.redeemContractAddress;
+          const extensionAddress = data.publicData.extensionAddress;
+          const burnTknUrl = `https://app.manifold.xyz/br/${data.slug}`;
 
-        await ProductContractModel.updateOne(
-          { productId: productId }, // Filter criteria
-          {
-            $set: {
-              redeemContractAddress: redeemContractAddress,
-              burnContractAddress: burnContractAddress,
-              extensionAddress: extensionAddress,
-              burnTknUrl: burnTknUrl,
-            },
-          }, // Update values
-          { upsert: true }
-        )
-          .then((result) => {
-            resolve(true);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+          await ProductContractModel.updateOne(
+            { productId: productId }, // Filter criteria
+            {
+              $set: {
+                redeemContractAddress: redeemContractAddress,
+                burnContractAddress: burnContractAddress,
+                extensionAddress: extensionAddress,
+                burnTknUrl: burnTknUrl,
+                manifoldId: manifoldId,
+                ipfsUrl: 'NA',
+              },
+            }, // Update values
+            { upsert: true }
+          )
+            .then((result) => {
+              resolve(true);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        } catch (error) {
+          reject(error);
+        }
       })
     );
   });
@@ -309,13 +315,12 @@ export async function storeAllMetadata(client: GraphqlClient) {
         const fileData = JSON.stringify(metadata);
         const fileName = `/${redeemedTokenAddress}/${i}`;
 
-        //TODO: store in mongo with address and ipfs link
         files.push({
           fileName,
           fileData,
         });
       }
-
+      Number;
       try {
         const formData = new FormData();
         files.forEach((file) => {
@@ -336,8 +341,12 @@ export async function storeAllMetadata(client: GraphqlClient) {
         if (response.status === 200) {
           const data = response.data;
           const cid = data.value.cid;
-          const imageUrl = 'https://ipfs.io/ipfs/' + cid;
-          resolve(imageUrl);
+          const ipfsUrl = 'https://ipfs.io/ipfs/' + cid;
+
+          product.ipfsUrl = ipfsUrl;
+          product.save();
+
+          resolve(ipfsUrl);
         } else {
           reject(
             new Error(`Failed to upload directory. Status: ${response.status}`)

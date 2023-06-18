@@ -1,21 +1,40 @@
 import React, { useState } from 'react';
-import { Page, TextField, Button, LegacyCard } from '@shopify/polaris';
+import {
+  Page,
+  TextField,
+  Button,
+  LegacyCard,
+  Modal,
+  Spinner,
+} from '@shopify/polaris';
 import useFetch from '../../hooks/useFetch';
 import { navigate } from 'raviger';
 
 const MetadataPreview = () => {
   const [orderId, setOrderId] = useState('');
   const [responseBody, setResponseBody] = useState('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const fetch = useFetch();
 
   const handleFetchMetadata = async () => {
     try {
+      setIsLoading(true);
+
       const response = await fetch(`/metadata_preview/${orderId}`);
       const json = await response.json();
       setResponseBody(JSON.stringify(json, null, 2));
+      setIsPopupOpen(true);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setResponseBody('');
   };
 
   return (
@@ -25,13 +44,23 @@ const MetadataPreview = () => {
     >
       <LegacyCard sectioned>
         <TextField label="Order ID" value={orderId} onChange={setOrderId} />
-        <Button onClick={handleFetchMetadata}>Fetch Metadata</Button>
+        <Button onClick={handleFetchMetadata} disabled={isLoading}>
+          {isLoading ? <Spinner size="small" /> : 'Fetch Metadata'}
+        </Button>
       </LegacyCard>
-      {responseBody && (
-        <LegacyCard sectioned>
+      <Modal
+        open={isPopupOpen}
+        onClose={handleClosePopup}
+        title="Metadata Preview Response"
+        primaryAction={{
+          content: 'OK',
+          onAction: handleClosePopup,
+        }}
+      >
+        <Modal.Section>
           <pre>{responseBody}</pre>
-        </LegacyCard>
-      )}
+        </Modal.Section>
+      </Modal>
     </Page>
   );
 };

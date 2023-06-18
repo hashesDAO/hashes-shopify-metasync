@@ -3,10 +3,12 @@ import { Redirect } from '@shopify/app-bridge/actions';
 import {
   Layout,
   LegacyCard,
+  Button,
   Link,
   ResourceList,
   Page,
   TextField,
+  Modal,
 } from '@shopify/polaris';
 import { navigate } from 'raviger';
 import React, { useEffect, useState } from 'react';
@@ -16,7 +18,8 @@ const BurnEvents = () => {
   const app = useAppBridge();
   const redirect = Redirect.create(app);
   const [responseData, setResponseData] = useState([]);
-  const [responseDataRefresh, setResponseDataRefresh] = useState([]);
+  const [responseDataRefresh, setResponseDataRefresh] = useState('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const fetch = useFetch();
 
   async function fetchContent() {
@@ -45,21 +48,15 @@ const BurnEvents = () => {
       } else {
         setResponseDataRefresh(json.error);
       }
+
+      setIsPopupOpen(true);
     } catch (error) {
       console.error(error);
     }
   }
 
-  let responseColor = '';
-  if (responseDataRefresh.includes('Burns added to database')) {
-    responseColor = 'green';
-  } else {
-    responseColor = 'red';
-  }
-
   useEffect(() => {
     fetchContent();
-    fetchContentPost();
   }, []);
 
   const rows = responseData.map((item) => ({
@@ -105,6 +102,11 @@ const BurnEvents = () => {
     );
   };
 
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setResponseDataRefresh('');
+  };
+
   return (
     <Page
       title="Burn Events"
@@ -112,19 +114,28 @@ const BurnEvents = () => {
     >
       <Layout>
         <Layout.Section>
-          {responseDataRefresh && (
-            <p style={{ color: responseColor }}>{responseDataRefresh}</p>
-          )}
-          <LegacyCard
-            sectioned
-            primaryFooterAction={{
-              content: 'Refresh',
-              onAction: async () => {
-                await fetchContentPost();
-              },
+          <LegacyCard>
+            <LegacyCard.Section>
+              <Button primary onClick={fetchContentPost}>
+                Refresh
+              </Button>
+            </LegacyCard.Section>
+          </LegacyCard>
+          <Modal
+            open={isPopupOpen}
+            onClose={handleClosePopup}
+            title="Refresh Response"
+            primaryAction={{
+              content: 'OK',
+              onAction: handleClosePopup,
             }}
           >
-            {renderContent()}
+            <Modal.Section>
+              <p>{responseDataRefresh}</p>
+            </Modal.Section>
+          </Modal>
+          <LegacyCard>
+            <LegacyCard.Section>{renderContent()}</LegacyCard.Section>
           </LegacyCard>
         </Layout.Section>
       </Layout>

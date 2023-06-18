@@ -26,6 +26,14 @@ const productContractSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  manifoldId: {
+    type: String,
+    required: true,
+  },
+  ipfsUrl: {
+    type: String,
+    required: true,
+  },
 });
 
 const ProductContractModel = mongoose.model(

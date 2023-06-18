@@ -7,6 +7,9 @@ import {
   ResourceList,
   Page,
   TextField,
+  Spinner,
+  Modal,
+  TextContainer,
 } from '@shopify/polaris';
 import { navigate } from 'raviger';
 import React, { useEffect, useState } from 'react';
@@ -21,7 +24,8 @@ const ConfigureProducts = () => {
     productId: '',
     manifoldId: '',
   });
-
+  const [loading, setLoading] = useState(false);
+  const [modalActive, setModalActive] = useState(false); // Add modal state
   const fetch = useFetch();
 
   useEffect(() => {
@@ -30,6 +34,7 @@ const ConfigureProducts = () => {
 
   async function configureProductsPost() {
     setResponseDataPost('loading...');
+    setLoading(true);
     try {
       const res = await fetch('/admin/configure_products/', {
         headers: {
@@ -50,12 +55,16 @@ const ConfigureProducts = () => {
       } else {
         setResponseDataPost(json.error);
       }
+      setModalActive(true); // Open the modal
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function getSavedProducts() {
+    setLoading(true);
     try {
       const res = await fetch('/admin/products/', {
         headers: {
@@ -68,6 +77,8 @@ const ConfigureProducts = () => {
       setSavedProducts(json);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -93,6 +104,7 @@ const ConfigureProducts = () => {
 
   const rows = savedProducts.map((product) => ({
     id: product._id,
+    manifoldId: product.manifoldId,
     productId: product.productId,
     redeemContractAddress: product.redeemContractAddress,
     burnContractAddress: product.burnContractAddress,
@@ -103,6 +115,10 @@ const ConfigureProducts = () => {
   const resourceName = {
     singular: 'product',
     plural: 'products',
+  };
+
+  const closeModal = () => {
+    setModalActive(false);
   };
 
   return (
@@ -160,6 +176,7 @@ const ConfigureProducts = () => {
               renderItem={(item) => {
                 const {
                   id,
+                  manifoldId,
                   productId,
                   redeemContractAddress,
                   burnContractAddress,
@@ -172,6 +189,7 @@ const ConfigureProducts = () => {
                     accessibilityLabel={`View details for ${productId}`}
                   >
                     <h3>ProductId: {productId}</h3>
+                    <h3>Manifold Id: {manifoldId}</h3>
                     <div>Redeem Contract Address: {redeemContractAddress}</div>
                     <div>Burn Contract Address: {burnContractAddress}</div>
                     <div>Extension Address: {extensionAddress}</div>
@@ -183,47 +201,67 @@ const ConfigureProducts = () => {
           </LegacyCard>
         </Layout.Section>
         <Layout.Section>
-          <LegacyCard
-            sectioned
-            primaryFooterAction={{
-              content: 'Submit',
-              onAction: () => {
-                configureProductsPost();
-              },
-              disabled: isSubmitDisabled,
-            }}
-            secondaryFooterActions={[
-              {
-                content: 'Clear',
-                onAction: clearForm,
-              },
-            ]}
-          >
-            {responseDataPost && (
-              <p style={{ color: responseColor }}>{responseDataPost}</p>
-            )}
-            <TextField
-              label="Product ID"
-              value={productData.productId}
-              onChange={(newValue) =>
-                setProductData({ ...productData, productId: newValue })
-              }
-              required={true}
-            />
-            <TextField
-              label="Manifold Burn app ID"
-              value={productData.manifoldId}
-              onChange={(newValue) =>
-                setProductData({
-                  ...productData,
-                  manifoldId: newValue,
-                })
-              }
-              required={true}
-            />
-          </LegacyCard>
+          {loading ? (
+            <Spinner accessibilityLabel="Loading" size="large" color="teal" />
+          ) : (
+            <LegacyCard
+              sectioned
+              primaryFooterAction={{
+                content: 'Submit',
+                onAction: () => {
+                  configureProductsPost();
+                },
+                disabled: isSubmitDisabled,
+              }}
+              secondaryFooterActions={[
+                {
+                  content: 'Clear',
+                  onAction: clearForm,
+                },
+              ]}
+            >
+              <TextField
+                label="Product ID"
+                value={productData.productId}
+                onChange={(newValue) =>
+                  setProductData({ ...productData, productId: newValue })
+                }
+                required={true}
+              />
+              <TextField
+                label="Manifold Burn app ID"
+                value={productData.manifoldId}
+                onChange={(newValue) =>
+                  setProductData({
+                    ...productData,
+                    manifoldId: newValue,
+                  })
+                }
+                required={true}
+              />
+            </LegacyCard>
+          )}
         </Layout.Section>
       </Layout>
+
+      {/* Modal for displaying responseDataPost */}
+      {modalActive && (
+        <Modal
+          open={modalActive}
+          onClose={closeModal}
+          title="Response Data"
+          primaryAction={{
+            content: 'OK',
+            onAction: closeModal,
+          }}
+        >
+          <Modal.Section>
+            <TextContainer>
+              <p style={{ color: responseColor }}>{responseDataPost}</p>
+            </TextContainer>
+          </Modal.Section>
+        </Modal>
+      )}
     </Page>
   );
 };

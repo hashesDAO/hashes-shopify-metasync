@@ -3,8 +3,8 @@ import {
   getNFTMetadataByToken,
   getTransactionHashesForMint,
   getBurnedErc721ForTx,
-  addCustomMetadataFieldPerToken,
-  removeCustomMetadataFieldPerToken,
+  addVerisartUrlToToken,
+  removeVerisartUrlFromToken,
   getTotalSupply,
 } from '../services/NftService';
 import { getMetadataPreviewForOrder } from '../../server/services/AdminService';
@@ -31,34 +31,32 @@ nftRoute.get('/metadata_preview/:orderId', async (req, res) => {
     });
 });
 
-// add a custom metadata key/value on a token basis
-nftRoute.post('/metadata/custom_metadata', async (req, res) => {
+nftRoute.post('/metadata/verisart_url', async (req, res) => {
   const jsonData = JSON.stringify(req.body);
-  const promises = await addCustomMetadataFieldPerToken(jsonData);
+  const promises = await addVerisartUrlToToken(jsonData);
 
   Promise.all(promises)
     .then((r: any) => {
-      res.json({ success: true, message: 'Custom metadata added to tokens' });
+      res.json({ success: true, message: 'Verisart urls added to tokens' });
     })
     .catch((err: any) => {
-      res.status(500).json({ error: 'Failed to add custom metadata' });
+      res.status(500).json({ error: 'Failed to add verisart urls' });
     });
 });
 
-// add a custom metadata key/value on a token basis
-nftRoute.delete('/metadata/custom_metadata', async (req, res) => {
+nftRoute.delete('/metadata/verisart_url', async (req, res) => {
   const jsonData = JSON.stringify(req.body);
-  const promises = await removeCustomMetadataFieldPerToken(jsonData);
+  const promises = await removeVerisartUrlFromToken(jsonData);
 
   Promise.all(promises)
     .then((r: any) => {
       res.json({
         success: true,
-        message: 'Custom metadata removed from tokens',
+        message: 'Verisart url removed from tokens',
       });
     })
     .catch((err: any) => {
-      res.status(500).json({ error: 'Failed to remove custom metadata' });
+      res.status(500).json({ error: 'Failed to remove verisart urls' });
     });
 });
 

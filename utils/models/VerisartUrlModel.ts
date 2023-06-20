@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
 // Model for adding a custom metadata field on a token basis
-const tokenMetadataFieldSchema = new mongoose.Schema({
+const verisartUrlSchema = new mongoose.Schema({
   //This is the asset being burned
-  burnContractAddress: {
+  tokenGateAddress: {
     type: String,
     required: true,
   },
@@ -13,20 +13,12 @@ const tokenMetadataFieldSchema = new mongoose.Schema({
     required: true,
   },
   // metadata key
-  metadataKey: {
-    type: String,
-    required: true,
-  },
-  // metadata value
-  metadataValue: {
+  url: {
     type: String,
     required: true,
   },
 });
 
-const TokenMetadataFieldModel = mongoose.model(
-  'token_metadata',
-  tokenMetadataFieldSchema
-);
+const VerisartUrlsModel = mongoose.model('verisart_urls', verisartUrlSchema);
 
-export default TokenMetadataFieldModel;
+export default VerisartUrlsModel;

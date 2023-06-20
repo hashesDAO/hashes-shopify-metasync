@@ -4,33 +4,27 @@ import fetch from 'node-fetch';
 import { Erc721Abi } from '../../utils/abi/erc721Abi';
 
 import { ethers } from 'ethers';
-import TokenMetadataFieldModel from '../../utils/models/TokenMetadataFieldModel';
+import VerisartUrlsModel from '../../utils/models/VerisartUrlModel';
 
-// Stores a custom field on a token basis to mongo
-export async function addCustomMetadataFieldPerToken(
-  responseRequestBody: string
-) {
+export async function addVerisartUrlToToken(responseRequestBody: string) {
   const jsonReponse = JSON.parse(responseRequestBody);
   const promises: Promise<any>[] = [];
 
   jsonReponse?.tokens.forEach(async (token: any) => {
     const contractAddr = token.tokenGateAddress;
     const tokenId = token.tokenId;
-    const metadataKey = token.metadataKey;
-    const metadataValue = token.metadataValue;
+    const url = token.url;
 
     promises.push(
       new Promise(async (resolve, reject) => {
-        await TokenMetadataFieldModel.updateOne(
+        await VerisartUrlsModel.updateOne(
           {
-            burnContractAddress: contractAddr,
+            tokenGateAddress: contractAddr,
             tokenId: tokenId,
-            metadataKey: metadataKey,
           },
           {
             $set: {
-              metadataValue: metadataValue,
-              burnContractAddress: contractAddr,
+              url: url,
             },
           },
           { upsert: true }
@@ -48,23 +42,19 @@ export async function addCustomMetadataFieldPerToken(
   return promises;
 }
 
-export async function removeCustomMetadataFieldPerToken(
-  responseRequestBody: string
-) {
+export async function removeVerisartUrlFromToken(responseRequestBody: string) {
   const jsonReponse = JSON.parse(responseRequestBody);
   const promises: Promise<any>[] = [];
 
   jsonReponse?.tokens.forEach(async (token: any) => {
     const contractAddr = token.tokenGateAddress;
     const tokenId = token.tokenId;
-    const metadataKey = token.metadataKey;
 
     promises.push(
       new Promise(async (resolve, reject) => {
-        await TokenMetadataFieldModel.deleteOne({
+        await VerisartUrlsModel.deleteOne({
           burnContractAddress: contractAddr,
           tokenId: tokenId,
-          metadataKey: metadataKey,
         })
           .then((result) => {
             resolve(true);
@@ -78,12 +68,12 @@ export async function removeCustomMetadataFieldPerToken(
 
   return promises;
 }
-export async function customMetadataByTokenId(
+export async function verisartUrlByBurnedTokenId(
   tokenGateAddress: string,
   tokenId: string
 ) {
-  return await TokenMetadataFieldModel.find({
-    burnContractAddress: tokenGateAddress,
+  return await VerisartUrlsModel.findOne({
+    tokenGateAddress: tokenGateAddress,
     tokenId: tokenId,
   });
 }

@@ -13,6 +13,10 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+  },
   walletUsed: {
     type: String,
     required: true,
@@ -31,6 +35,10 @@ const orderSchema = new mongoose.Schema({
     required: true,
   },
   burned: {
+    type: Boolean,
+    required: true,
+  },
+  gaming: {
     type: Boolean,
     required: true,
   },

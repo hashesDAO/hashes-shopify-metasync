@@ -7,7 +7,7 @@ import ProductContractModel from '../../utils/models/ProductContractModel';
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import BurnToRedeemModel from '../../utils/models/BurnToRedeemModel';
 import {
-  customMetadataByTokenId,
+  verisartUrlByBurnedTokenId,
   getBurnedErc721ForTx,
   getNFTMetadataByToken,
   getTotalSupply,
@@ -159,12 +159,19 @@ export async function storeBurnEvents(
                   { $set: { burned: true } }
                 );
 
+                const tags = ['Burned'];
+
+                if (order.gaming) {
+                  tags.push('REVIEW ME');
+                }
+
+                console.log(tags);
                 client
                   .query({
                     data: `mutation {
                       orderUpdate(input: { id: "gid://shopify/Order/${
                         order.globalId
-                      }", tags: ${JSON.stringify(['Burned'])} }) {
+                      }", tags: ${JSON.stringify(tags)} }) {
                         order {
                           id
                           tags
@@ -217,17 +224,14 @@ export async function getMetadataPreviewForOrder(
       const burnContractAddress = burnRedeemModel.burnContractAddress;
       const burnTokenId = burnRedeemModel.burnedTokenId;
 
-      const customMetadataForToken = await customMetadataByTokenId(
+      const verisartUrl = await verisartUrlByBurnedTokenId(
         burnContractAddress,
         burnTokenId.toString()
       );
 
-      customMetadataForToken.forEach((element) => {
-        metadataPreUpdate.attributes.push({
-          trait_type: element.metadataKey,
-          value: element.metadataValue,
-        });
-      });
+      if (verisartUrl) {
+        metadataPreUpdate.description = `Print Edition Certificate: ${verisartUrl.url}\n\n${metadataPreUpdate.description}`;
+      }
 
       metadataPreUpdate.attributes.push({
         trait_type: 'Order Number',
@@ -282,17 +286,14 @@ export async function storeAllMetadata(client: GraphqlClient) {
         if (burnRedeemModel) {
           const burnTokenId = burnRedeemModel.burnedTokenId;
 
-          const customMetadataForToken = await customMetadataByTokenId(
+          const verisartUrl = await verisartUrlByBurnedTokenId(
             burnedTokenAddress,
             burnTokenId.toString()
           );
 
-          customMetadataForToken.forEach((element) => {
-            newMetadata.attributes.push({
-              trait_type: element.metadataKey,
-              value: element.metadataValue,
-            });
-          });
+          if (verisartUrl) {
+            newMetadata.description = `Print Edition Certificate: ${verisartUrl.url}\n\n${newMetadata.description}`;
+          }
 
           newMetadata.attributes.push({
             trait_type: 'Order Number',
@@ -378,11 +379,13 @@ export async function updateEverything(client: GraphqlClient) {
           }
           nodes {
             name
+            email
             id
             lineItems(first: 10) {
               edges {
                 node {
                   name
+                  quantity
                   product {
                     id
                   }
@@ -412,6 +415,7 @@ export async function updateEverything(client: GraphqlClient) {
         orders.forEach((order: any) => {
           const orderId = order.id.match(/Order\/(.*)$/)[1];
           const orderNumber = parseInt(order.name.slice(1));
+          const email = order.email;
 
           if (order.lineItems && order.lineItems.edges) {
             const lineItems = order.lineItems.edges;
@@ -420,6 +424,7 @@ export async function updateEverything(client: GraphqlClient) {
               const productId =
                 lineItem.node.product.id.match(/Product\/(.*)$/)[1];
               const lineItemCustomAttributes = lineItem.node.customAttributes;
+              const quantity = lineItem.node.quantity;
 
               if (lineItemCustomAttributes) {
                 const walletUsed = lineItemCustomAttributes.find(
@@ -446,10 +451,12 @@ export async function updateEverything(client: GraphqlClient) {
                     productId: productId,
                     orderNumber: orderNumber,
                     walletUsed: walletUsed,
+                    email: email,
                     tokenId: tokenId,
                     tokenGateId: tokenGateId,
                     fufilled: false,
                     burned: false,
+                    gaming: quantity > 1,
                   }).catch((error) => {
                     console.log('Already added');
                   });

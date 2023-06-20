@@ -10,7 +10,7 @@ import ConfigureProducts from './pages/adminCards/ConfigureProducts';
 import BurnEvents from './pages/adminCards/BurnEvents';
 import MetadataPreview from './pages/metadataCards/MetadataPreview';
 import MetadataIndex from './pages/metadataCards/MetadataIndex';
-import CustomMetadataPage from './pages/metadataCards/CustomMetadata';
+import VerisartUrlPage from './pages/metadataCards/VerisartUrls';
 import RepairApp from './pages/adminCards/RepairApp';
 import OpenseaUpdate from './pages/metadataCards/OpenseaUpdate';
 import UploadToIPFS from './pages/metadataCards/UploadToIpfs';
@@ -26,7 +26,7 @@ const routes = {
   // Metadata Cards
   '/metadata': () => <MetadataIndex />,
   '/metadata/preview': () => <MetadataPreview />,
-  '/metadata/custom': () => <CustomMetadataPage />,
+  '/metadata/verisart': () => <VerisartUrlPage />,
   '/metadata/refresh': () => <OpenseaUpdate />,
   '/metadata/ipfs': () => <UploadToIPFS />,
   //Debug Cards

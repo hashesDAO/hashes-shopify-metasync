@@ -37,8 +37,8 @@ const HomePage = () => {
                 everything is working
               </li>
               <li>
-                Add custom metadata if needed. This is how verisart URLs can be
-                added.
+                Add verisart urls. We add these based off the tokengate address
+                and tokenId used.
               </li>
               <li>
                 Check metadata preview again to ensure the values were taken

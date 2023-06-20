@@ -27,17 +27,15 @@ const MetadataIndex = () => {
           </LegacyCard>
           <LegacyCard
             sectioned
-            title="Add custom metadata"
+            title="Add verisart urls"
             primaryFooterAction={{
               content: 'View',
               onAction: () => {
-                navigate('/metadata/custom');
+                navigate('/metadata/verisart');
               },
             }}
           >
-            <p>
-              Add custom metdata on a per token basis. Used for verisart links
-            </p>
+            <p>Add verisart urls on a per token basis</p>
           </LegacyCard>
           <LegacyCard
             sectioned

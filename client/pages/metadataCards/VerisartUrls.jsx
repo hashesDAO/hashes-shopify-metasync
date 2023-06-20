@@ -10,20 +10,18 @@ import {
 import useFetch from '../../hooks/useFetch';
 import { navigate } from 'raviger';
 
-const CustomMetadataPage = () => {
+const VerisartUrlPage = () => {
   const initialJsonObjectPost = {
     tokens: [
       {
         tokenGateAddress: '0xee19aab41dab3726fcbde668674db6aacb971b69',
         tokenId: '20',
-        metadataKey: 'verisart url',
-        metadataValue: 'https://someurl',
+        url: 'https://someverisarturl',
       },
       {
         tokenGateAddress: '0xee19aab41dab3726fcbde668674db6aacb971b69',
         tokenId: '4',
-        metadataKey: 'verisart url',
-        metadataValue: 'https://someotherurl',
+        url: 'https://someotherverisarturl',
       },
     ],
   };
@@ -33,12 +31,12 @@ const CustomMetadataPage = () => {
       {
         tokenGateAddress: '0xee19aab41dab3726fcbde668674db6aacb971b69',
         tokenId: '20',
-        metadataKey: 'verisart url',
+        url: 'https://someverisarturl',
       },
       {
         tokenGateAddress: '0xee19aab41dab3726fcbde668674db6aacb971b69',
         tokenId: '4',
-        metadataKey: 'verisart url',
+        url: 'https://someotherverisarturl',
       },
     ],
   };
@@ -56,7 +54,7 @@ const CustomMetadataPage = () => {
 
   let responseColor = '';
 
-  if (responseBody.includes('Custom metadata')) {
+  if (responseBody.includes('Verisart url')) {
     responseColor = 'green';
   } else {
     responseColor = 'red';
@@ -65,7 +63,7 @@ const CustomMetadataPage = () => {
   const handlePostMetadata = async () => {
     try {
       const updatedJsonObjectPost = JSON.parse(jsonText);
-      const response = await fetch('/metadata/custom_metadata', {
+      const response = await fetch('/metadata/verisart_url', {
         method: 'POST',
         body: JSON.stringify(updatedJsonObjectPost),
         headers: {
@@ -75,7 +73,7 @@ const CustomMetadataPage = () => {
 
       const json = await response.json();
       if (json.message) {
-        setResponseBody('Custom metadata configured');
+        setResponseBody('Verisart urls added');
       } else {
         setResponseBody(json.error);
       }
@@ -89,7 +87,7 @@ const CustomMetadataPage = () => {
   const handleDeleteMetadata = async () => {
     try {
       const updatedJsonObjectDelete = JSON.parse(jsonText);
-      const response = await fetch('/metadata/custom_metadata', {
+      const response = await fetch('/metadata/verisart_url', {
         method: 'DELETE',
         body: JSON.stringify(updatedJsonObjectDelete),
         headers: {
@@ -122,7 +120,7 @@ const CustomMetadataPage = () => {
 
   return (
     <Page
-      title="Custom Metadata Page"
+      title="Verisart url config"
       breadcrumbs={[{ content: 'Home', onAction: () => navigate('/metadata') }]}
     >
       <Modal
@@ -143,24 +141,24 @@ const CustomMetadataPage = () => {
 
       <LegacyCard sectioned>
         <TextField
-          label="Custom metadata"
+          label="Add verisart urls for tokens"
           multiline={10}
           value={jsonText}
           onChange={handleJsonTextChange}
         />
-        <Button onClick={handlePostMetadata}>Post Metadata</Button>
+        <Button onClick={handlePostMetadata}>Add</Button>
       </LegacyCard>
       <LegacyCard sectioned>
         <TextField
-          label="Delete custom field"
+          label="Delete verisart urls for tokens"
           multiline={10}
           value={jsonText}
           onChange={handleJsonTextChange}
         />
-        <Button onClick={handleDeleteMetadata}>Delete Metadata</Button>
+        <Button onClick={handleDeleteMetadata}>Delete</Button>
       </LegacyCard>
     </Page>
   );
 };
 
-export default CustomMetadataPage;
+export default VerisartUrlPage;

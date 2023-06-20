@@ -9,6 +9,7 @@ const orderPaidHandler = async (
   const jsonReponse = JSON.parse(webhookRequestBody);
   const id = jsonReponse.id;
   const orderNumber = jsonReponse.order_number;
+  const email = jsonReponse.email;
 
   jsonReponse?.line_items.forEach(async (item: any) => {
     const walletUsed = item.properties.find(
@@ -24,16 +25,19 @@ const orderPaidHandler = async (
     )?.value;
 
     const productId = item.product_id;
+    const quantity = item.quantity;
 
     await OrderPaidModel.create({
       globalId: id,
       productId: productId,
       orderNumber: orderNumber,
+      email: email,
       walletUsed: walletUsed,
       tokenId: tokenId,
       tokenGateId: tokenGateId,
       fufilled: false,
       burned: false,
+      gaming: quantity > 1,
     });
   });
 };

@@ -39,6 +39,18 @@ const AdminIndex = () => {
           </LegacyCard>
           <LegacyCard
             sectioned
+            title="Customer Emails"
+            primaryFooterAction={{
+              content: 'View',
+              onAction: () => {
+                navigate('/admin/email');
+              },
+            }}
+          >
+            <p>Gets customers emails</p>
+          </LegacyCard>
+          <LegacyCard
+            sectioned
             title="Repair app"
             primaryFooterAction={{
               content: 'View',

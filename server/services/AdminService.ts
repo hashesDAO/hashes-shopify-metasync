@@ -81,14 +81,6 @@ export async function configureProductsForBurnRedeem(
   return promises;
 }
 
-export async function getConfiguredProducts() {
-  return await ProductContractModel.find();
-}
-
-export async function getburnEvents() {
-  return await BurnToRedeemModel.find();
-}
-
 export async function updateMetadataForAllProducts() {
   const products = await getConfiguredProducts();
 
@@ -498,4 +490,25 @@ export async function updateOSMetadataForCollection(contractAddress: string) {
     `https://api.opensea.io/api/v1/asset/${contractAddress}/?force_update=true`
   );
   await res.status;
+}
+
+export async function getConfiguredProducts() {
+  return await ProductContractModel.find();
+}
+
+export async function getburnEvents() {
+  return await BurnToRedeemModel.find();
+}
+
+export async function getAllEmails() {
+  return await OrderPaidModel.find({}, 'email');
+}
+
+export async function getEmailsForUnBurned() {
+  return await OrderPaidModel.find(
+    {
+      burned: false,
+    },
+    'email'
+  );
 }

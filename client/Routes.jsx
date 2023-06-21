@@ -14,6 +14,7 @@ import VerisartUrlPage from './pages/metadataCards/VerisartUrls';
 import RepairApp from './pages/adminCards/RepairApp';
 import OpenseaUpdate from './pages/metadataCards/OpenseaUpdate';
 import UploadToIPFS from './pages/metadataCards/UploadToIpfs';
+import EmailListPage from './pages/adminCards/Email';
 
 const routes = {
   '/': () => <Index />,
@@ -23,6 +24,7 @@ const routes = {
   '/admin/configure': () => <ConfigureProducts />,
   '/admin/burn': () => <BurnEvents />,
   '/admin/repair': () => <RepairApp />,
+  '/admin/email': () => <EmailListPage />,
   // Metadata Cards
   '/metadata': () => <MetadataIndex />,
   '/metadata/preview': () => <MetadataPreview />,

@@ -2,7 +2,9 @@ import { Router } from 'express';
 
 import {
   configureProductsForBurnRedeem,
+  getAllEmails,
   getConfiguredProducts,
+  getEmailsForUnBurned,
   getburnEvents,
   storeAllMetadata,
   storeBurnEvents,
@@ -38,6 +40,26 @@ adminRoute.get('/admin/products', async (req, res) => {
 
 adminRoute.get('/admin/burns', async (req, res) => {
   await getburnEvents()
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    });
+});
+
+adminRoute.get('/admin/emails', async (req, res) => {
+  await getAllEmails()
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    });
+});
+
+adminRoute.get('/admin/emails_unburned', async (req, res) => {
+  await getEmailsForUnBurned()
     .then((result) => {
       res.json(result);
     })

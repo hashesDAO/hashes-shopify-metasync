@@ -23,8 +23,8 @@ export default function App() {
         <NavigationMenu
           navigationLinks={[
             {
-              label: 'Fetch Data',
-              destination: '/debug/getData',
+              label: 'Debug',
+              destination: '/debug/activeWebhooks',
             },
           ]}
           matcher={(link) => currentPath === link.destination}

@@ -117,3 +117,5 @@ build
 .tern-port
 
 build/
+
+local.env

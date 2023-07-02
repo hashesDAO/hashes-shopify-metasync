@@ -3,28 +3,28 @@ import { Redirect } from '@shopify/app-bridge/actions';
 import { Layout, LegacyCard, Page } from '@shopify/polaris';
 import { navigate } from 'raviger';
 import React, { useEffect } from 'react';
-import useFetch from '../hooks/useFetch';
+// import useFetch from '../hooks/useFetch';
 
 const HomePage = () => {
   const app = useAppBridge();
-  const fetch = useFetch();
+//   const fetch = useFetch();
   const redirect = Redirect.create(app);
 
-  useEffect(async () => {
-    try {
-      const res = await fetch('admin/burns', {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        method: 'GET',
-      });
-      const json = await res.json();
-      setResponseData(json);
-    } catch (error) {
-      console.error(error);
-    }
-  });
+//   useEffect(async () => {
+//     try {
+//       const res = await fetch('admin/burns', {
+//         headers: {
+//           Accept: 'application/json',
+//           'Content-Type': 'application/json',
+//         },
+//         method: 'GET',
+//       });
+//       const json = await res.json();
+//       setResponseData(json);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   });
 
   return (
     <Page title="Home">
@@ -40,7 +40,7 @@ const HomePage = () => {
                     onAction: () => {
                       redirect.dispatch(
                         Redirect.Action.REMOTE,
-                        `https://${appOrigin}/auth?shop=printeditions.myshopify.com`
+                        `https://${appOrigin}/auth?shop=printeditions.myshopify.com` //TODO: CHANGE ME IF APP CHANGES
                       );
                     },
                   }

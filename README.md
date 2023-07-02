@@ -12,14 +12,6 @@ This app is designed to be used within Hashes DAO shopify stores. This app aims 
 - Ngrok
 - Apollo/Client
 
-## Notes
-
-There are two different ways to use this app:
-
-- The first is by requiring the user to burn an ERC1155 upon checkout. The app will fulfill the order upon the user doing so.
-
-- The second, is using ERC 721s. The app will watch for paid orders, and update the tokens metadata, indicating the token has already been used for claiming.
-
 ### Setup
 
 - [ ] Run `npm i --force` to install dependencies.
@@ -54,8 +46,6 @@ There are two different ways to use this app:
 
 - [ ] Run `node devUtils/updateDashboard.js` to update the url on your shopify app or just update the values manually in your shopify app
 
-- [ ]
-
 - [ ] NPM Scripts
 
   - `update` and `update:check`: Depends on `npm-check-updates` to force update packages to the latest available version. Can potentially break things.
@@ -71,9 +61,31 @@ There are two different ways to use this app:
   - `s:e:create`: Create extension scaffolding using CLI 3.0. A new folder called `extensions` is created at root that uses the new folder structure.
   - `s:e:deploy`: Deploy extension(s) to Shopify.
 
-### TODO
+### Production setup notes
 
-- Admin UI
-- Debug UI
-- Publish NFT metadata
-- Update docs with workflow, and setup guides
+- [ ] https://partners.shopify.com/ create app
+- [ ] Create app manually
+- [ ] Choose distribution
+  - [ ] Single merchant install
+  - [ ] Paste link to shopify store
+  - [ ] Copy install link for later
+- [ ] Create heroku account
+- [ ] From command line install heroku if not already installed
+- [ ] [Setup a mongo DB with atlas](https://www.mongodb.com/developer/products/atlas/use-atlas-on-heroku/#prerequisites)
+  - [ ] Note the mongo setting is MONGO_URL in our app
+- [ ] Setup env vars from heroku app settings / config vars **(make sure there are no quotes!!!!) ALSO (MAKE SURE URL DOES NOT END IN A /)**
+  - [ ] Add a setting NODE_OPTIONS with value `--max_old_space_size=2560`
+- [ ] Setup heroku app
+  - [ ] `heroku create unique-project-name`
+  - [ ] `git add . `
+  - [ ] `git commit -m “setting up to push to Heroku”`
+  - [ ] `git push heroku master`
+  - [ ] `heroku ps:scale web=1
+`
+- [ ] Go to your app on shopify partners and go to urls:
+  - [ ] App URL: heroku app url
+  - [ ] Allowed redirect urls: `https://yourherokuurl/auth/tokens https://yourherokuurl/auth/callback`
+  - [ ] App proxy - prefix `apps` subpath `proxy` proxy url `https://yourherokuurl/proxy`
+- [ ] Paste the merchant install link into your browser the install app button will not be selectable
+- [ ] Change the url to be `https://yourherokuurl/auth?shop=theurltoyourshopifyshop` ex `https://d03a-2600-1700-8c00-f50-a0f4-496f-da7c-225d.ngrok-free.app/auth?shop=e34460.myshopify.com`
+- [ ] Paste the merchant install link again, and the green install button should work now

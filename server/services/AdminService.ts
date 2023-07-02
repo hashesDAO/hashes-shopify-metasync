@@ -72,7 +72,7 @@ export async function configureProductsForBurnRedeem(
               reject(error);
             });
         } catch (error) {
-          reject(error);
+          reject(`Error: ${error}`);
         }
       })
     );
@@ -225,21 +225,6 @@ export async function getMetadataPreviewForOrder(
         metadataPreUpdate.description = `Print Edition Certificate: ${verisartUrl.url}\n\n${metadataPreUpdate.description}`;
       }
 
-      metadataPreUpdate.attributes.push({
-        trait_type: 'Order Number',
-        value: orderNumber,
-      });
-
-      metadataPreUpdate.attributes.push({
-        trait_type: 'Burned Token Address',
-        value: burnContractAddress,
-      });
-
-      metadataPreUpdate.attributes.push({
-        trait_type: 'Burned Token ID',
-        value: burnTokenId,
-      });
-
       return {
         tokenId: burnRedeemModel.redeemedTokenId,
         metadata: metadataPreUpdate,
@@ -286,21 +271,6 @@ export async function storeAllMetadata(client: GraphqlClient) {
           if (verisartUrl) {
             newMetadata.description = `Print Edition Certificate: ${verisartUrl.url}\n\n${newMetadata.description}`;
           }
-
-          newMetadata.attributes.push({
-            trait_type: 'Order Number',
-            value: burnRedeemModel.orderNumber.toString(),
-          });
-
-          newMetadata.attributes.push({
-            trait_type: 'Burned Token Address',
-            value: burnedTokenAddress,
-          });
-
-          newMetadata.attributes.push({
-            trait_type: 'Burned Token ID',
-            value: burnTokenId.toString(),
-          });
         }
 
         const fileData = JSON.stringify(newMetadata);
@@ -323,7 +293,7 @@ export async function storeAllMetadata(client: GraphqlClient) {
           formData,
           {
             headers: {
-              Authorization: `Bearer ${process.env.NFT_STORAGE_API_KEY}`, // Replace with your NFT.Storage API key
+              Authorization: `Bearer ${process.env.NFT_STORAGE_API_KEY}`,
               ...formData.getHeaders(),
             },
           }

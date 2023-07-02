@@ -2,16 +2,56 @@ import { useAppBridge } from '@shopify/app-bridge-react';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { Layout, LegacyCard, Page } from '@shopify/polaris';
 import { navigate } from 'raviger';
-import React from 'react';
+import React, { useEffect } from 'react';
+import useFetch from '../hooks/useFetch';
 
 const HomePage = () => {
   const app = useAppBridge();
+  const fetch = useFetch();
   const redirect = Redirect.create(app);
+
+  useEffect(async () => {
+    try {
+      const res = await fetch('admin/burns', {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+      });
+      const json = await res.json();
+      setResponseData(json);
+    } catch (error) {
+      console.error(error);
+    }
+  });
 
   return (
     <Page title="Home">
       <Layout>
         <Layout.Section fullWidth>
+          <LegacyCard
+            title="Reauth"
+            sectioned
+            primaryFooterAction={
+              true
+                ? {
+                    content: 'Reauth',
+                    onAction: () => {
+                      redirect.dispatch(
+                        Redirect.Action.REMOTE,
+                        `https://${appOrigin}/auth?shop=printeditions.myshopify.com`
+                      );
+                    },
+                  }
+                : { content: 'Fetching data', disabled: true }
+            }
+          >
+            <p>
+              When facing issues, we may need to reauth the app by clicking the
+              button below.
+            </p>
+          </LegacyCard>
           <LegacyCard title="Instructions for use">
             <LegacyCard.Section>
               <li>

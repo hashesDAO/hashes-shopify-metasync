@@ -151,7 +151,20 @@ export async function storeBurnEvents(
                   { $set: { burned: true } }
                 );
 
-                const tags = ['Burned'];
+                const tokensInOrder = await OrderPaidModel.find({
+                  orderNumber: order.orderNumber,
+                });
+                const allBurned = tokensInOrder.every(
+                  (result) => result.burned === true
+                );
+
+                const tags = [];
+
+                if (allBurned) {
+                  tags.push('Burned');
+                } else {
+                  tags.push('PARTIAL BURN');
+                }
 
                 if (order.gaming) {
                   tags.push('REVIEW ME');

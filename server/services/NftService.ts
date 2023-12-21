@@ -121,6 +121,7 @@ export async function getNFTMetadataByToken(
             resolve(result);
           })
           .catch((error) => {
+            console.error(`Couldn't get metadata with URI: ${metadataURI}`);
             reject(error);
           });
       } else {

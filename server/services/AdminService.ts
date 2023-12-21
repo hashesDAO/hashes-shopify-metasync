@@ -2,10 +2,12 @@ import 'dotenv/config';
 import fetch from 'node-fetch';
 import axios from 'axios';
 import FormData from 'form-data';
+import fs from 'fs';
 
 import ProductContractModel from '../../utils/models/ProductContractModel';
 import OrderPaidModel from '../../utils/models/OrderPaidModel';
 import BurnToRedeemModel from '../../utils/models/BurnToRedeemModel';
+import VerisartUrlsModel from '../../utils/models/VerisartUrlModel';
 import {
   verisartUrlByBurnedTokenId,
   getBurnedErc721ForTx,
@@ -14,6 +16,7 @@ import {
   getTransactionHashesForMint,
 } from './NftService';
 import { GraphqlClient } from '@shopify/shopify-api/lib/clients/graphql/graphql_client';
+import { selectHttpOptionsAndBody } from '@apollo/client';
 
 export async function configureProductsForBurnRedeem(
   responseRequestBody: string
@@ -256,86 +259,166 @@ export async function storeAllMetadata(client: GraphqlClient) {
   const products = await getConfiguredProducts();
   const uploadPromises = [];
 
-  for (const product of products) {
-    const uploadPromise = new Promise(async (resolve, reject) => {
-      const redeemedTokenAddress = product.redeemContractAddress;
-      const burnedTokenAddress = product.burnContractAddress;
-      const totalRedeemedQuantity = await getTotalSupply(redeemedTokenAddress);
-      const files = [];
+  // different manifold ids per product but thats it
+  const redeemedTokenAddress = products[0].redeemContractAddress.toLowerCase();
+  const burnedTokenAddress = products[0].burnContractAddress.toLowerCase();
+  const totalRedeemedQuantity = 225;
 
-      const metadata = await getNFTMetadataByToken(redeemedTokenAddress, '1');
+  let blossomingIncr = 0;
+  let mehretuIncr = 0;
+  let schematicIncr = 0;
 
-      for (let i = 1; i < totalRedeemedQuantity! + 1; i++) {
-        const newMetadata = JSON.parse(JSON.stringify(metadata));
-        const burnRedeemModel = await BurnToRedeemModel.findOne({
-          burnContractAddress: burnedTokenAddress,
-          redeemContractAddress: redeemedTokenAddress,
-          redeemedTokenId: i,
-        });
+  const blossomingCerts = JSON.parse(
+    fs.readFileSync('scripts/outputs/blossoming.json', 'utf8')
+  );
+  const mehretuCerts = JSON.parse(
+    fs.readFileSync('scripts/outputs/mehretu.json', 'utf8')
+  );
+  const schematicCerts = JSON.parse(
+    fs.readFileSync('scripts/outputs/schematic.json', 'utf8')
+  );
 
-        if (burnRedeemModel) {
-          const burnTokenId = burnRedeemModel.burnedTokenId;
+  const uploadPromise = new Promise(async (resolve, reject) => {
+    const files = [];
+    const allMetadata = [];
+    const allNewMetadata = [];
+    // const veristartUrls = await VerisartUrlsModel.find({})
 
-          const verisartUrl = await verisartUrlByBurnedTokenId(
-            burnedTokenAddress,
-            burnTokenId.toString()
-          );
+    // veristartUrls.forEach(async (v) => {
+    //   const b = await BurnToRedeemModel.findOne({burnedTokenId: v.tokenId});
 
-          if (verisartUrl) {
-            newMetadata.description = `Print Edition Certificate: ${verisartUrl.url}\n\n${newMetadata.description}`;
-          }
-        }
+    //   if (!b) {
+    //     console.log(`Token ${v.tokenId} not burned`)
+    //   }
+    // })
 
-        const fileData = JSON.stringify(newMetadata);
-        const fileName = `/${redeemedTokenAddress}/${i}`;
+    for (let i = 1; i < totalRedeemedQuantity! + 1; i++) {
+      const metadata = await getNFTMetadataByToken(
+        redeemedTokenAddress,
+        i.toString()
+      );
+      const newMetadata = JSON.parse(JSON.stringify(metadata));
+      const burnRedeemModel = await BurnToRedeemModel.findOne({
+        redeemedTokenId: i,
+      });
 
-        files.push({
-          fileName,
-          fileData,
-        });
-      }
+      allMetadata.push(metadata);
 
-      try {
-        const formData = new FormData();
-        files.forEach((file) => {
-          formData.append('file', file.fileData, file.fileName);
-        });
+      if (burnRedeemModel) {
+        const burnTokenId = burnRedeemModel.burnedTokenId;
 
-        const response = await axios.post(
-          'https://api.nft.storage/upload',
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.NFT_STORAGE_API_KEY}`,
-              ...formData.getHeaders(),
-            },
-          }
+        const verisartUrl = await verisartUrlByBurnedTokenId(
+          burnedTokenAddress,
+          burnTokenId.toString()
         );
 
-        if (response.status === 200) {
-          const data = response.data;
-          const cid = data.value.cid;
-          const ipfsUrl = 'https://ipfs.io/ipfs/' + cid;
+        if (verisartUrl) {
+          newMetadata.description = `Print Edition Certificate: ${verisartUrl.url} \n\n ${newMetadata.description}`;
+        } else {
+          console.log(`No url found ${i}`);
+        }
+      } else {
+        if (
+          newMetadata.attributes.find(
+            (attribute: any) => attribute.trait_type === 'Editions'
+          )
+        ) {
+          try {
+            let verisartUrl;
+            if (newMetadata.name.includes('Schematic #')) {
+              verisartUrl = schematicCerts[schematicIncr];
+              schematicIncr++;
+            } else if (newMetadata.name.includes('Blossoming Cadaver #')) {
+              verisartUrl = blossomingCerts[blossomingIncr];
+              blossomingIncr++;
+            } else if (newMetadata.name.includes('Mehretu #')) {
+              verisartUrl = mehretuCerts[mehretuIncr];
+              mehretuIncr++;
+            } else {
+              console.log(newMetadata.name);
+            }
 
+            if (verisartUrl.url) {
+              newMetadata.description = `Print Edition Certificate: ${verisartUrl.url} \n\n ${newMetadata.description}`;
+            }
+          } catch (e) {
+            console.log(`Error when getting metadata for token ${i} - ${e}`);
+          }
+        } else {
+          console.log(metadata);
+        }
+      }
+
+      const fileData = JSON.stringify(newMetadata);
+      const fileName = `/${redeemedTokenAddress}/${i}`;
+
+      files.push({
+        fileName,
+        fileData,
+      });
+      allNewMetadata.push(newMetadata);
+    }
+
+    // Used to double check results manually before upload
+    // fs.writeFile(
+    //   'initialMetadata.json',
+    //   JSON.stringify(allMetadata),
+    //   'utf8',
+    //   function (err) {
+    //     if (err) throw err;
+    //   }
+    // );
+
+    // fs.writeFile(
+    //   'newMetadata.json',
+    //   JSON.stringify(allNewMetadata),
+    //   'utf8',
+    //   function (err) {
+    //     if (err) throw err;
+    //   }
+    // );
+
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('file', file.fileData, file.fileName);
+      });
+
+      const response = await axios.post(
+        'https://api.nft.storage/upload',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NFT_STORAGE_API_KEY}`,
+            ...formData.getHeaders(),
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const data = response.data;
+        const cid = data.value.cid;
+        const ipfsUrl = 'ipfs/' + cid;
+
+        products.forEach((product) => {
           product.ipfsUrl = ipfsUrl;
           product.save();
+        });
 
-          resolve(ipfsUrl);
-        } else {
-          reject(
-            new Error(`Failed to upload directory. Status: ${response.status}`)
-          );
-        }
-      } catch (error) {
-        console.error('Error uploading directory:', error);
-        reject(error);
+        resolve(ipfsUrl);
+      } else {
+        reject(
+          new Error(`Failed to upload directory. Status: ${response.status}`)
+        );
       }
-    });
+    } catch (error) {
+      console.error('Error uploading directory:', error);
+      reject(error);
+    }
+    resolve('');
+  });
 
-    uploadPromises.push(uploadPromise);
-  }
-
-  return uploadPromises;
+  return uploadPromise;
 }
 
 export async function updateEverything(client: GraphqlClient) {

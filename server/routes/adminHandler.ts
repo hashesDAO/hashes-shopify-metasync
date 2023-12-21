@@ -110,15 +110,13 @@ adminRoute.post('/admin/updateOS', async (req, res) => {
 });
 
 adminRoute.post('/admin/upload_ipfs', async (req, res) => {
-  const { client } = await clientProvider.graphqlClient({
-    req,
-    res,
-    isOnline: true,
-  });
+  // const { client } = await clientProvider.graphqlClient({
+  //   req,
+  //   res,
+  //   isOnline: true,
+  // });
 
-  const promise = await storeAllMetadata(client);
-  Promise.all(promise)
-    .then((result: any) => {
+  await storeAllMetadata().then((result: any) => {
       res.json({ success: true, message: `IPFS CID: ${result}` });
     })
     .catch((err: any) => {

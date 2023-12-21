@@ -4,8 +4,6 @@ import nftRoute from '../nftHandler';
 
 const proxyRouter = Router();
 
-// proxyRouter.use(nftRoute);
-
 proxyRouter.get('/json', async (req, res) => {
   return res.status(200).send({ content: 'Proxy Be Working' });
 });

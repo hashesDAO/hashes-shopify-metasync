@@ -159,7 +159,7 @@ const UploadToIPFS = () => {
                     <h3>instancedId: {manifoldId}</h3>
                     <div>storageProtocol: 3</div>
                     <div>identical: false</div>
-                    <div>location: {new URL(ipfsUrl).pathname}</div>
+                    <div>location: {ipfsUrl}</div>
                   </ResourceList.Item>
                 );
               }}
